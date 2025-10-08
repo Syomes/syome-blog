@@ -8,18 +8,6 @@ export default {
       typography: {
         DEFAULT: {
           css: {
-            'blockquote p::before': {
-              content: '""',
-            },
-            'blockquote p::after': {
-              content: '""',
-            },
-            'code::before': {
-              content: '""',
-            },
-            'code::after': {
-              content: '""',
-            },
             'code': {
               backgroundColor: '#777777',
               color: '#ffffff',

@@ -48,3 +48,13 @@ pre code, .prose pre code {
   max-width: 100%;
   display: block;
 }
+
+.prose code::before,
+.prose code::after {
+  content: unset;
+}
+
+blockquote p::before,
+blockquote p::after {
+  content: none !important;
+}
