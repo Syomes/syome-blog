@@ -5,10 +5,10 @@ interface Props {
   languages?: string[];
 }
 
-import "../styles/bubbles.css";
 import "../styles/page.css";
 import Footer from '../components/Footer.astro';
 import siteConfig from '../custom/site-config';
+import Bubbles from "../components/Bubbles.astro";
 const { title, repoUrl, languages } = Astro.props as Props;
 ---
 
@@ -17,7 +17,7 @@ const { title, repoUrl, languages } = Astro.props as Props;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<div class="fixed inset-0 z-[-1]"></div>
 
@@ -30,15 +30,7 @@ const { title, repoUrl, languages } = Astro.props as Props;
 		
 		<div class="fixed inset-0 z-[-1] bg-gradient-to-br from-white to-gray-200 dark:from-gray-800/80 dark:to-gray-900/80"></div>
 
-		<div class="fixed inset-0 z-[-1]">
-			<div class="floating-bubbles">
-				<div class="bubble"></div>
-				<div class="bubble"></div>
-				<div class="bubble"></div>
-				<div class="bubble"></div>
-				<div class="bubble"></div>
-			</div>
-		</div>
+		<Bubbles />
 		
 		<header class="sticky top-0 z-30 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700">
 			<div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">

@@ -1,0 +1,19 @@
+---
+import "../styles/bubbles.css"
+
+interface Props {
+  bubbleCount?: number;
+}
+
+const { bubbleCount = 5 } = Astro.props
+---
+
+<div class="fixed inset-0 z-[-1]">
+    <div class="floating-bubbles">
+        {
+          Array.from({ length: bubbleCount }, (_, i) => (
+            <div class="bubble" />
+          ))
+        }
+    </div>
+</div>
