@@ -152,6 +152,7 @@ export async function loadGitHubStats(): Promise<void> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const githubStats: GitHubStatsData = await response.json();
+    const timestamp = response.headers.get('x-last-modified') || new Date().toString();
     
     const loadingElement = document.getElementById('github-stats-loading');
     if (loadingElement) {
@@ -296,6 +297,12 @@ export async function loadGitHubStats(): Promise<void> {
           window.removeEventListener('scroll', animateOnScroll);
         }
       };
+
+      const lastUpdatedElement = document.getElementById('last-updated-time');
+      if (lastUpdatedElement) {
+        const date = new Date(timestamp);
+        lastUpdatedElement.textContent = date.toLocaleDateString();
+      }
       
       if (isInViewport(contentElement)) {
         initLazyAnimations(githubStats);

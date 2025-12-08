@@ -22,7 +22,8 @@ export const GET: APIRoute = async () => {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache',
+        'X-Last-Modified': new Date().toUTCString()
       }
     });
   } catch (error) {
