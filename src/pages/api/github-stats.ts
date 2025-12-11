@@ -155,7 +155,7 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
     const languageStats: { [key: string]: number } = {};
     let totalSize = 0;
 
-    nonForkRepos.forEach((repo: any) => {
+    ownerRepos.forEach((repo: any) => {
       const langEdges = repo.languages?.edges || [];
       langEdges.forEach((edge: any) => {
         const name = edge.node?.name;
