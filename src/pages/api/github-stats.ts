@@ -23,7 +23,6 @@ export const GET: APIRoute = async () => {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
-        'X-Last-Modified': new Date().toUTCString()
       }
     });
   } catch (error) {
@@ -47,6 +46,7 @@ export interface GitHubStats {
   totalPullRequests: number;
   totalIssues: number;
   languages: { name: string; percentage: number }[];
+  lastUpdated: string;
 }
 
 export async function fetchGitHubStats(): Promise<GitHubStats> {
@@ -188,7 +188,8 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
       totalStars,
       totalPullRequests,
       totalIssues,
-      languages: filteredLanguages
+      languages: filteredLanguages,
+      lastUpdated: new Date().toUTCString()
     };
 
     return result;

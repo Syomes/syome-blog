@@ -8,6 +8,7 @@ interface GitHubStatsData {
   totalPullRequests: number;
   totalIssues: number;
   languages: { name: string; percentage: number }[];
+  lastUpdated: string;
 }
 
 const GITHUB_USERNAME = import.meta.env.PUBLIC_GITHUB_USERNAME;
