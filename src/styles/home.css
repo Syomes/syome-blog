@@ -1,4 +1,3 @@
-/* Header */
 @keyframes blob {
   0% {
     transform: translate(0px, 0px) scale(1);
@@ -29,7 +28,6 @@
   animation-delay: 4s;
 }
 
-/* Navbar */
 .avatar-container {
   position: relative;
 }

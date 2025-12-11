@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import type { GitHubStats } from '../../types';
 import siteConfig from '../../custom/site-config';
 
 const GITHUB_USERNAME = import.meta.env.PUBLIC_GITHUB_USERNAME;
@@ -36,27 +37,44 @@ export const GET: APIRoute = async () => {
   }
 };
 
-export interface GitHubStats {
-  contributions: number;
-  totalRepositories: number;
-  publicRepositories: number;
-  privateRepositories: number;
-  collaboratorRepositories: number;
-  totalStars: number;
-  totalPullRequests: number;
-  totalIssues: number;
-  languages: { name: string; percentage: number }[];
-  lastUpdated: string;
+function calculateLanguageStats(repos: any[]): { name: string; percentage: number }[] {
+  const languageStats: { [key: string]: number } = {};
+  let totalSize = 0;
+
+  repos.forEach((repo: any) => {
+    const langEdges = repo.languages?.edges || [];
+    langEdges.forEach((edge: any) => {
+      const name = edge.node?.name;
+      const size = edge.size || 0;
+      if (!name) return;
+      languageStats[name] = (languageStats[name] || 0) + size;
+      totalSize += size;
+    });
+  });
+
+  if (totalSize === 0) return [];
+
+  const languages = Object.entries(languageStats)
+    .map(([name, bytes]) => ({ name, percentage: (bytes / totalSize) * 100 }))
+    .sort((a, b) => b.percentage - a.percentage);
+
+  let otherLanguagesPercentage = 0;
+  const filteredLanguages = languages.filter(lang => {
+    if (lang.percentage >= 1) return true;
+    otherLanguagesPercentage += lang.percentage;
+    return false;
+  });
+
+  if (otherLanguagesPercentage > 0) {
+    filteredLanguages.push({ name: 'Other', percentage: otherLanguagesPercentage });
+  }
+  
+  return filteredLanguages;
 }
 
 export async function fetchGitHubStats(): Promise<GitHubStats> {
-  if (!GITHUB_TOKEN) {
-    throw new Error("No GitHub token found.");
-  }
-
-  if (!GITHUB_USERNAME) {
-    throw new Error("No GitHub username provided.");
-  }
+  if (!GITHUB_TOKEN) throw new Error("No GitHub token found.");
+  if (!GITHUB_USERNAME) throw new Error("No GitHub username provided.");
 
   try {
     const contributions = await getTotalContributions(GITHUB_TOKEN, GITHUB_USERNAME);
@@ -97,54 +115,101 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
         headers,
         body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME, after } })
       });
-
-      if (!res.ok) {
-        throw new Error(`GitHub GraphQL error: ${res.status}`);
-      }
-
+      if (!res.ok) throw new Error(`GitHub GraphQL error: ${res.status}`);
       const data: any = await res.json();
-      if (data.errors) {
-        throw new Error(`GitHub GraphQL error: ${JSON.stringify(data.errors)}`);
-      }
-
+      if (data.errors) throw new Error(`GitHub GraphQL error: ${JSON.stringify(data.errors)}`);
       const reposBlock: any = data.data.user?.repositories;
       if (!reposBlock) break;
-
       repos = repos.concat(reposBlock.nodes || []);
       hasNext = reposBlock.pageInfo?.hasNextPage;
       after = reposBlock.pageInfo?.endCursor || null;
-      if (repos.length >= 300) break;
     }
 
     const nonForkRepos = repos.filter(r => !r.isFork);
+    
+    const ownerRepos = nonForkRepos.filter(repo => repo.owner.login === GITHUB_USERNAME);
+    const collaboratorRepos = nonForkRepos.filter(repo => repo.owner.login !== GITHUB_USERNAME);
 
-    const ownerRepos = nonForkRepos.filter((repo: any) => repo.owner.login === GITHUB_USERNAME);
-    const collaboratorRepos = nonForkRepos.filter((repo: any) => repo.owner.login !== GITHUB_USERNAME);
+    const ownerReposPublic = ownerRepos.filter(r => !r.isPrivate);
+    const ownerReposPrivate = ownerRepos.filter(r => r.isPrivate);
+    const collaboratorReposPublic = collaboratorRepos.filter(r => !r.isPrivate);
+    const collaboratorReposPrivate = collaboratorRepos.filter(r => r.isPrivate);
 
-    const publicRepos = ownerRepos.filter((repo: any) => !repo.isPrivate).length;
-    const privateRepos = ownerRepos.filter((repo: any) => repo.isPrivate).length;
-    const collaboratorRepoCount = collaboratorRepos.length;
+    const sumStars = (repoList: any[]) => repoList.reduce((sum, repo) => sum + repo.stargazerCount, 0);
 
-    const totalStars = nonForkRepos.reduce((sum: number, repo: any) => sum + (repo.stargazerCount || 0), 0);
+    let personalPrCount = { public: 0, private: 0, total: 0 };
+    let collaboratorPrCount = { public: 0, private: 0, total: 0 };
+    let personalIssueCount = { public: 0, private: 0, total: 0 };
+    let collaboratorIssueCount = { public: 0, private: 0, total: 0 };
 
-    let totalPullRequests = 0;
-    let totalIssues = 0;
     try {
       const [prRes, issueRes] = await Promise.all([
-        fetch(`https://api.github.com/search/issues?q=type:pr+author:${GITHUB_USERNAME}&per_page=1`, { headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName } }),
-        fetch(`https://api.github.com/search/issues?q=type:issue+author:${GITHUB_USERNAME}&per_page=1`, { headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName } })
+        fetch(`https://api.github.com/search/issues?q=type:pr+author:${GITHUB_USERNAME}&per_page=100`, { 
+          headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName } 
+        }),
+        fetch(`https://api.github.com/search/issues?q=type:issue+author:${GITHUB_USERNAME}&per_page=100`, { 
+          headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName } 
+        })
       ]);
 
       if (prRes.ok) {
         const prData = await prRes.json();
-        totalPullRequests = prData.total_count || 0;
+        
+        for (const item of prData.items || []) {
+          const repoFullName = item.repository_url.split('/').slice(-2).join('/');
+          const [owner, repoName] = repoFullName.split('/');
+          
+          const isPersonalRepo = ownerRepos.some(r => r.owner.login === owner && r.name === repoName);
+          const isCollaboratorRepo = collaboratorRepos.some(r => r.owner.login === owner && r.name === repoName);
+          const isPrivateRepo = [...ownerReposPrivate, ...collaboratorReposPrivate].some(r => r.owner.login === owner && r.name === repoName);
+          
+          if (isPersonalRepo) {
+            if (isPrivateRepo) {
+              personalPrCount.private++;
+            } else {
+              personalPrCount.public++;
+            }
+            personalPrCount.total++;
+          } else if (isCollaboratorRepo) {
+            if (isPrivateRepo) {
+              collaboratorPrCount.private++;
+            } else {
+              collaboratorPrCount.public++;
+            }
+            collaboratorPrCount.total++;
+          }
+        }
       } else {
         console.warn(`Failed to fetch PRs: ${prRes.status}`);
       }
 
       if (issueRes.ok) {
         const issueData = await issueRes.json();
-        totalIssues = issueData.total_count || 0;
+        
+        for (const item of issueData.items || []) {
+          const repoFullName = item.repository_url.split('/').slice(-2).join('/');
+          const [owner, repoName] = repoFullName.split('/');
+          
+          const isPersonalRepo = ownerRepos.some(r => r.owner.login === owner && r.name === repoName);
+          const isCollaboratorRepo = collaboratorRepos.some(r => r.owner.login === owner && r.name === repoName);
+          const isPrivateRepo = [...ownerReposPrivate, ...collaboratorReposPrivate].some(r => r.owner.login === owner && r.name === repoName);
+          
+          if (isPersonalRepo) {
+            if (isPrivateRepo) {
+              personalIssueCount.private++;
+            } else {
+              personalIssueCount.public++;
+            }
+            personalIssueCount.total++;
+          } else if (isCollaboratorRepo) {
+            if (isPrivateRepo) {
+              collaboratorIssueCount.private++;
+            } else {
+              collaboratorIssueCount.public++;
+            }
+            collaboratorIssueCount.total++;
+          }
+        }
       } else {
         console.warn(`Failed to fetch issues: ${issueRes.status}`);
       }
@@ -152,44 +217,58 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
       console.error(`Error fetching PR/issue counts:`, error);
     }
 
-    const languageStats: { [key: string]: number } = {};
-    let totalSize = 0;
-
-    ownerRepos.forEach((repo: any) => {
-      const langEdges = repo.languages?.edges || [];
-      langEdges.forEach((edge: any) => {
-        const name = edge.node?.name;
-        const size = edge.size || 0;
-        if (!name) return;
-        languageStats[name] = (languageStats[name] || 0) + size;
-        totalSize += size;
-      });
-    });
-
-    const languages = Object.entries(languageStats)
-      .map(([name, bytes]) => ({ name, percentage: totalSize > 0 ? (bytes / totalSize) * 100 : 0 }))
-      .sort((a, b) => b.percentage - a.percentage);
-
-    let otherLanguagesPercentage = 0;
-    const filteredLanguages = languages.filter(lang => {
-      if (lang.percentage >= 1) return true;
-      otherLanguagesPercentage += lang.percentage;
-      return false;
-    });
-
-    if (otherLanguagesPercentage > 0) filteredLanguages.push({ name: 'Other', percentage: otherLanguagesPercentage });
-
-    const result = {
+    const result: GitHubStats = {
       contributions,
-      totalRepositories: nonForkRepos.length,
-      publicRepositories: publicRepos,
-      privateRepositories: privateRepos,
-      collaboratorRepositories: collaboratorRepoCount,
-      totalStars,
-      totalPullRequests,
-      totalIssues,
-      languages: filteredLanguages,
-      lastUpdated: new Date().toUTCString()
+      pullRequests: {
+        personal: personalPrCount,
+        collaborator: collaboratorPrCount,
+        overall: personalPrCount.total + collaboratorPrCount.total
+      },
+      issues: {
+        personal: personalIssueCount,
+        collaborator: collaboratorIssueCount,
+        overall: personalIssueCount.total + collaboratorIssueCount.total
+      },
+      repositories: {
+        personal: {
+          public: ownerReposPublic.length,
+          private: ownerReposPrivate.length,
+          total: ownerRepos.length,
+        },
+        collaborator: {
+          public: collaboratorReposPublic.length,
+          private: collaboratorReposPrivate.length,
+          total: collaboratorRepos.length,
+        },
+        overall: nonForkRepos.length,
+      },
+      stars: {
+        personal: {
+          public: sumStars(ownerReposPublic),
+          private: sumStars(ownerReposPrivate),
+          total: sumStars(ownerRepos),
+        },
+        collaborator: {
+          public: sumStars(collaboratorReposPublic),
+          private: sumStars(collaboratorReposPrivate),
+          total: sumStars(collaboratorRepos),
+        },
+        overall: sumStars(nonForkRepos),
+      },
+      languages: {
+        personal: {
+          public: calculateLanguageStats(ownerReposPublic),
+          private: calculateLanguageStats(ownerReposPrivate),
+          total: calculateLanguageStats(ownerRepos),
+        },
+        collaborator: {
+          public: calculateLanguageStats(collaboratorReposPublic),
+          private: calculateLanguageStats(collaboratorReposPrivate),
+          total: calculateLanguageStats(collaboratorRepos),
+        },
+        overall: calculateLanguageStats(nonForkRepos),
+      },
+      lastUpdated: new Date().toUTCString(),
     };
 
     return result;

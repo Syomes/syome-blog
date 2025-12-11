@@ -1,370 +1,340 @@
-interface GitHubStatsData {
-  contributions: number;
-  totalRepositories: number;
-  publicRepositories: number;
-  privateRepositories: number;
-  collaboratorRepositories: number;
-  totalStars: number;
-  totalPullRequests: number;
-  totalIssues: number;
-  languages: { name: string; percentage: number }[];
-  lastUpdated: string;
-}
+import type { GitHubStats, Language } from "../types";
+import { animateNumber, animateProgressBar, isInViewport } from "./stats-animation";
+import { buildStatsContent, buildErrorContent, buildLanguageStatsHtml, createLanguageItemElement } from "./html-builder";
+import autoAnimate from "@formkit/auto-animate";
 
 const GITHUB_USERNAME = import.meta.env.PUBLIC_GITHUB_USERNAME;
 
-function easeOutQuart(x: number): number {
-  return 1 - Math.pow(1 - x, 4);
+async function fetchGitHubStats(): Promise<GitHubStats> {
+  const response = await fetch('/api/github-stats');
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
 }
 
-function animateNumber(element: HTMLElement | null, target: number, decimals: number = 0, duration: number = 1000, isPercentage: boolean = false) {
-  if (!element) {
-    console.warn('Element not found for animation');
-    return;
-  }
-  
-  if (isNaN(target) || target === undefined || target === null) {
-    element.textContent = isPercentage ? '0.00%' : '0';
-    return;
-  }
+type CurrentFilter = {
+  category: 'overall' | 'personal' | 'collaborator';
+  visibility: 'public' | 'private' | 'total';
+};
 
-  if (target === 0) {
-    element.textContent = isPercentage ? '0.00%' : '0';
-    return;
-  }
+let currentActiveFilter: CurrentFilter = { category: 'overall', visibility: 'total' };
+let isLangStatsExpanded = false;
+let fullLanguageList: Language[] = [];
 
-  const startTime = performance.now();
-  
-  const animate = (currentTime: number) => {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const easedProgress = easeOutQuart(progress);
-    const current = target * easedProgress;
+function updateLanguageToggle(container: HTMLElement, listElement: HTMLElement, languages: Language[]) {
+  container.innerHTML = '';
+  if (languages.length > 5) {
+    const remainingCount = languages.length - 5;
+    const button = document.createElement('button');
+    button.className = 'text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 flex items-center justify-between w-full py-2 mt-2';
     
-    if (progress < 1) {
-      const displayValue = Math.max(0, current);
-      const formattedNumber = Number(displayValue).toLocaleString(undefined, {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-      });
-      element.textContent = isPercentage ? formattedNumber + '%' : formattedNumber;
-      requestAnimationFrame(animate);
-    } else {
-      const displayValue = Math.max(0, target);
-      const formattedNumber = Number(displayValue).toLocaleString(undefined, {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-      });
-      element.textContent = isPercentage ? formattedNumber + '%' : formattedNumber;
+    const textSpan = document.createElement('span');
+    textSpan.textContent = isLangStatsExpanded ? 'Collapse' : `Show ${remainingCount} more languages`;
+    
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'w-4 h-4 transition-transform duration-300');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>`;
+    svg.style.transform = isLangStatsExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+
+    button.append(textSpan, svg);
+    container.appendChild(button);
+
+    button.addEventListener('click', () => {
+      isLangStatsExpanded = !isLangStatsExpanded;
+      updateLanguageDisplay(listElement, languages);
+      updateLanguageToggle(container, listElement, languages);
+    });
+  }
+}
+
+function updateLanguageDisplay(listElement: HTMLElement, languages: Language[]) {
+  const languagesToShow = isLangStatsExpanded ? languages : languages.slice(0, 5);
+  const existingElements = new Map<string, HTMLElement>();
+  listElement.querySelectorAll<HTMLElement>('.language-item').forEach(el => {
+    if (el.dataset.lang) {
+      existingElements.set(el.dataset.lang, el);
     }
-  };
-  
-  requestAnimationFrame(animate);
-}
-
-function animateProgressBar(element: HTMLElement | null, targetWidth: number, duration: number = 1000) {
-  if (!element) {
-    console.warn('Progress bar element not found for animation');
-    return;
-  }
-  
-  if (isNaN(targetWidth) || targetWidth === undefined || targetWidth === null) {
-    element.style.width = '0%';
-    return;
-  }
-
-  if (targetWidth === 0) {
-    element.style.width = '0%';
-    return;
-  }
-
-  const startTime = performance.now();
-  
-  const animate = (currentTime: number) => {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const easedProgress = easeOutQuart(progress);
-    const currentWidth = targetWidth * easedProgress;
-    
-    if (progress < 1) {
-      element.style.width = currentWidth + '%';
-      requestAnimationFrame(animate);
-    } else {
-      element.style.width = targetWidth + '%';
-    }
-  };
-  
-  requestAnimationFrame(animate);
-}
-
-function isInViewport(element: HTMLElement): boolean {
-  const rect = element.getBoundingClientRect();
-  const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-  const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
-  
-  return (
-    rect.top <= windowHeight * 0.7 &&
-    rect.left <= windowWidth * 0.7 &&
-    rect.bottom >= windowHeight * 0.3 &&
-    rect.right >= windowWidth * 0.3
-  );
-}
-
-function animateExtraLanguages() {
-  document.querySelectorAll('.progress-bar-extra').forEach((bar: Element) => {
-    const progressBar = bar as HTMLElement;
-    const targetWidth = parseFloat(progressBar.dataset.targetWidth || '0');
-    const index = progressBar.dataset.index;
-    
-    const percentElement = document.getElementById(`extra-lang-percent-${index}`);
-    animateNumber(percentElement, targetWidth, 2, 1000, true);
-    
-    animateProgressBar(progressBar, targetWidth);
   });
+
+  const newElementList: HTMLElement[] = [];
+
+  languagesToShow.forEach(lang => {
+    let itemElement = existingElements.get(lang.name);
+    if (itemElement) {
+      const percentEl = itemElement.querySelector<HTMLElement>('.lang-percent');
+      const progressBarEl = itemElement.querySelector<HTMLElement>('.progress-bar');
+      const oldPercent = parseFloat(percentEl?.textContent || '0');
+      const oldWidth = parseFloat(progressBarEl?.style.width || '0');
+
+      if (percentEl) animateNumber(percentEl, lang.percentage, 2, 1000, true, oldPercent);
+      if (progressBarEl) animateProgressBar(progressBarEl, lang.percentage, 1000, oldWidth);
+      
+      existingElements.delete(lang.name);
+    } else {
+      itemElement = createLanguageItemElement(lang);
+      const percentEl = itemElement.querySelector<HTMLElement>('.lang-percent');
+      const progressBarEl = itemElement.querySelector<HTMLElement>('.progress-bar');
+      if (percentEl) animateNumber(percentEl, lang.percentage, 2, 1000, true);
+      if (progressBarEl) animateProgressBar(progressBarEl, lang.percentage);
+    }
+    newElementList.push(itemElement);
+  });
+
+  listElement.replaceChildren(...newElementList);
 }
 
-function initLazyAnimations(githubStats: GitHubStatsData) {
-  
+
+function initFixedAnimations(githubStats: GitHubStats) {
   animateNumber(document.getElementById('contributions-count'), githubStats.contributions || 0, 0);
-  animateNumber(document.getElementById('repositories-count'), githubStats.totalRepositories || 0, 0);
-  animateNumber(document.getElementById('public-repos-count'), githubStats.publicRepositories || 0, 0);
-  animateNumber(document.getElementById('private-repos-count'), githubStats.privateRepositories || 0, 0);
-  animateNumber(document.getElementById('collab-repos-count'), githubStats.collaboratorRepositories || 0, 0);
-  animateNumber(document.getElementById('stars-count'), githubStats.totalStars || 0, 0);
-  animateNumber(document.getElementById('prs-count'), githubStats.totalPullRequests || 0, 0);
-  animateNumber(document.getElementById('issues-count'), githubStats.totalIssues || 0, 0);
+  animateNumber(document.getElementById('repositories-count'), githubStats.repositories.overall || 0, 0);
+  animateNumber(document.getElementById('prs-count'), githubStats.pullRequests.overall || 0, 0);
+  animateNumber(document.getElementById('issues-count'), githubStats.issues.overall || 0, 0);
+
+  animateNumber(document.getElementById('personal-repos-total'), githubStats.repositories.personal.total || 0, 0);
+  animateNumber(document.getElementById('collaborator-repos-total'), githubStats.repositories.collaborator.total || 0, 0);
   
-  document.querySelectorAll('.progress-bar').forEach((bar: Element) => {
-    const progressBar = bar as HTMLElement;
-    const targetWidth = parseFloat(progressBar.dataset.targetWidth || '0');
-    const index = progressBar.dataset.index;
-    
-    const percentElement = document.getElementById(`lang-percent-${index}`);
-    animateNumber(percentElement, targetWidth, 2, 1000, true);
-    
-    animateProgressBar(progressBar, targetWidth);
-  });
+  animateNumber(document.getElementById('personal-public-repos'), githubStats.repositories.personal.public || 0, 0);
+  animateNumber(document.getElementById('personal-private-repos'), githubStats.repositories.personal.private || 0, 0);
+  
+  animateNumber(document.getElementById('collaborator-public-repos'), githubStats.repositories.collaborator.public || 0, 0);
+  animateNumber(document.getElementById('collaborator-private-repos'), githubStats.repositories.collaborator.private || 0, 0);
 }
 
-export async function loadGitHubStats(): Promise<void> {
-  try {
-    const response = await fetch('/api/github-stats');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const githubStats: GitHubStatsData = await response.json();
-    const timestamp = response.headers.get('x-last-modified') || new Date().toString();
-    
-    const loadingElement = document.getElementById('github-stats-loading');
-    if (loadingElement) {
-      loadingElement.classList.add('hidden');
-    }
-    
-    const contentElement = document.getElementById('github-stats-content');
-    if (contentElement) {
-      contentElement.innerHTML = `
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div class="text-center p-3 bg-gray-50 dark:bg-gray-600 rounded-lg">
-            <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400" id="contributions-count">0</p>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Contributions</p>
-          </div>
-          <div class="text-center p-3 bg-gray-50 dark:bg-gray-600 rounded-lg">
-            <p class="text-2xl font-bold text-green-600 dark:text-green-400" id="repositories-count">0</p>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Total Repositories</p>
-          </div>
-        </div>
-        
-        <div class="grid grid-cols-3 gap-4 mb-4">
-          <div class="text-center p-2 bg-blue-50 dark:bg-blue-900 rounded-lg">
-            <p class="text-xl font-bold text-blue-600 dark:text-blue-300" id="stars-count">0</p>
-            <p class="text-xs text-gray-600 dark:text-gray-300">Stars</p>
-          </div>
-          <div class="text-center p-2 bg-purple-50 dark:bg-purple-900 rounded-lg">
-            <p class="text-xl font-bold text-purple-600 dark:text-purple-300" id="prs-count">0</p>
-            <p class="text-xs text-gray-600 dark:text-gray-300">PRs</p>
-          </div>
-          <div class="text-center p-2 bg-yellow-50 dark:bg-yellow-900 rounded-lg">
-            <p class="text-xl font-bold text-yellow-600 dark:text-yellow-300" id="issues-count">0</p>
-            <p class="text-xs text-gray-600 dark:text-gray-300">Issues</p>
-          </div>
-        </div>
-        
-        <div class="flex flex-wrap justify-between gap-2 mb-4">
-          <div class="text-center">
-            <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
-              Public: <span id="public-repos-count">0</span>
-            </span>
-          </div>
-          <div class="text-center">
-            <span class="inline-block px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
-              Collaborator: <span id="collab-repos-count">0</span>
-            </span>
-          </div>
-          <div class="text-center">
-            <span class="inline-block px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm">
-              Private: <span id="private-repos-count">0</span>
-            </span>
-          </div>
-        </div>
-        
-        ${githubStats.languages && githubStats.languages.length > 0 ? `
-          <div>
-            <h4 class="font-medium text-gray-900 dark:text-white mb-2">Language Usage</h4>
-            <div class="space-y-2" id="language-stats">
-              ${githubStats.languages.slice(0, 5).map((lang, index) => `
-                <div>
-                  <div class="flex justify-between text-sm mb-1">
-                    <span class="text-gray-700 dark:text-gray-300">${lang.name}</span>
-                    <span class="text-gray-500 dark:text-gray-400" id="lang-percent-${index}">0.00%</span>
-                  </div>
-                  <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                    <div 
-                      class="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full progress-bar" 
-                      data-target-width="${lang.percentage || 0}"
-                      data-index="${index}"
-                      style="width: 0%"
-                    ></div>
-                  </div>
-                </div>
-              `).join('')}
-              
-              ${githubStats.languages.length > 5 ? `
-                <div class="mt-4">
-                  <div id="extra-languages" class="max-h-0 overflow-hidden transition-all duration-500">
-                    <div class="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                      ${githubStats.languages.slice(5).map((lang, index) => `
-                        <div>
-                          <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-700 dark:text-gray-300">${lang.name}</span>
-                            <span class="text-gray-500 dark:text-gray-400" id="extra-lang-percent-${index}">0.00%</span>
-                          </div>
-                          <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                            <div 
-                              class="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full progress-bar-extra" 
-                              data-target-width="${lang.percentage || 0}"
-                              data-index="${index}"
-                              style="width: 0%"
-                            ></div>
-                          </div>
-                        </div>
-                      `).join('')}
-                    </div>
-                  </div>
-                  <button 
-                    id="toggle-languages"
-                    class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 flex items-center justify-between w-full py-2 mt-2"
-                  >
-                    <span id="toggle-text">Show ${githubStats.languages.length - 5} more languages</span>
-                    <svg 
-                      id="toggle-arrow"
-                      class="w-4 h-4 transition-transform duration-300" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24" 
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </button>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        ` : `
-          <div class="text-center py-4 text-gray-500 dark:text-gray-400">
-            <p>No language data available</p>
-          </div>
-        `}
-        
-        <div class="mt-4 text-center">
-          <a 
-            href="https://github.com/${GITHUB_USERNAME}"
-            target="_blank" 
-            class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-          >
-            View on GitHub
-            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-            </svg>
-          </a>
-        </div>
-      `;
-      
-      contentElement.classList.remove('hidden');
-      
-      const animateOnScroll = () => {
-        if (isInViewport(contentElement)) {
-          initLazyAnimations(githubStats);
-          window.removeEventListener('scroll', animateOnScroll);
-        }
-      };
+function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
+  currentActiveFilter = filter;
+  isLangStatsExpanded = false;
 
-      const lastUpdatedElement = document.getElementById('last-updated-time');
-      if (lastUpdatedElement) {
-        const date = new Date(timestamp);
-        lastUpdatedElement.textContent = date.toLocaleDateString();
-      }
-      
-      if (isInViewport(contentElement)) {
-        initLazyAnimations(githubStats);
+  const starsCountElement = document.getElementById('stars-count');
+  const currentStars = parseFloat(starsCountElement?.textContent?.replace(/,/g, '') || '0');
+  let newStarsCount = 0;
+  if (filter.category === 'overall') {
+    newStarsCount = githubStats.stars.overall || 0;
+  } else {
+    const categoryData = githubStats.stars[filter.category];
+    if (categoryData) {
+      if (filter.visibility === 'public') newStarsCount = categoryData.public || 0;
+      else if (filter.visibility === 'private') newStarsCount = categoryData.private || 0;
+      else newStarsCount = categoryData.total || 0;
+    }
+  }
+  animateNumber(starsCountElement, newStarsCount, 0, 1000, false, currentStars);
+
+  const prsCountElement = document.getElementById('prs-count');
+  const currentPrs = parseFloat(prsCountElement?.textContent?.replace(/,/g, '') || '0');
+  let newPrsCount = 0;
+  if (filter.category === 'overall') {
+    newPrsCount = githubStats.pullRequests.overall || 0;
+  } else {
+    const categoryData = githubStats.pullRequests[filter.category];
+    if (categoryData) {
+      if (filter.visibility === 'public') newPrsCount = categoryData.public || 0;
+      else if (filter.visibility === 'private') newPrsCount = categoryData.private || 0;
+      else newPrsCount = categoryData.total || 0;
+    }
+  }
+  animateNumber(prsCountElement, newPrsCount, 0, 1000, false, currentPrs);
+
+  const issuesCountElement = document.getElementById('issues-count');
+  const currentIssues = parseFloat(issuesCountElement?.textContent?.replace(/,/g, '') || '0');
+  let newIssuesCount = 0;
+  if (filter.category === 'overall') {
+    newIssuesCount = githubStats.issues.overall || 0;
+  } else {
+    const categoryData = githubStats.issues[filter.category];
+    if (categoryData) {
+      if (filter.visibility === 'public') newIssuesCount = categoryData.public || 0;
+      else if (filter.visibility === 'private') newIssuesCount = categoryData.private || 0;
+      else newIssuesCount = categoryData.total || 0;
+    }
+  }
+  animateNumber(issuesCountElement, newIssuesCount, 0, 1000, false, currentIssues);
+
+  const languageSectionElement = document.getElementById('language-stats-section');
+  if (filter.category === 'overall') {
+    fullLanguageList = githubStats.languages.overall || [];
+  } else {
+    const categoryData = githubStats.languages[filter.category];
+    if (categoryData) {
+      if (filter.visibility === 'public') fullLanguageList = categoryData.public || [];
+      else if (filter.visibility === 'private') fullLanguageList = categoryData.private || [];
+      else fullLanguageList = categoryData.total || [];
+    }
+  }
+
+  if (languageSectionElement) {
+    const langList = document.getElementById('language-stats-list');
+    const toggleContainer = document.getElementById('language-toggle-container');
+    if (langList && toggleContainer) {
+      updateLanguageDisplay(langList, fullLanguageList);
+      updateLanguageToggle(toggleContainer, langList, fullLanguageList);
+    }
+  }
+
+  const personalLabel = document.getElementById('personal-label');
+  const collaboratorLabel = document.getElementById('collaborator-label');
+  const personalTotal = document.getElementById('personal-repos-total');
+  const collaboratorTotal = document.getElementById('collaborator-repos-total');
+  const personalPublicToggle = document.getElementById('personal-public-toggle');
+  const personalPrivateToggle = document.getElementById('personal-private-toggle');
+  const collaboratorPublicToggle = document.getElementById('collaborator-public-toggle');
+  const collaboratorPrivateToggle = document.getElementById('collaborator-private-toggle');
+
+  if (personalLabel) personalLabel.classList.remove('hidden');
+  if (collaboratorLabel) collaboratorLabel.classList.remove('hidden');
+  if (personalTotal) personalTotal.classList.remove('hidden');
+  if (collaboratorTotal) collaboratorTotal.classList.remove('hidden');
+  if (personalPublicToggle) personalPublicToggle.classList.add('hidden');
+  if (personalPrivateToggle) personalPrivateToggle.classList.add('hidden');
+  if (collaboratorPublicToggle) collaboratorPublicToggle.classList.add('hidden');
+  if (collaboratorPrivateToggle) collaboratorPrivateToggle.classList.add('hidden');
+
+  document.querySelectorAll('.repo-toggle-container .active-filter').forEach(el => el.classList.remove('active-filter'));
+
+  if (filter.category === 'personal') {
+    const personalSummary = document.getElementById('personal-summary');
+    if (personalSummary) {
+      personalSummary.classList.add('active-filter');
+    }
+    if (personalLabel) personalLabel.classList.add('hidden');
+    if (personalPublicToggle) personalPublicToggle.classList.remove('hidden');
+    if (personalPrivateToggle) personalPrivateToggle.classList.remove('hidden');
+    if (filter.visibility === 'public') {
+      document.getElementById('personal-public-toggle')?.classList.add('active-filter');
+    } else if (filter.visibility === 'private') {
+      document.getElementById('personal-private-toggle')?.classList.add('active-filter');
+    } else {
+      document.getElementById('personal-public-toggle')?.classList.add('active-filter');
+      document.getElementById('personal-private-toggle')?.classList.add('active-filter');
+    }
+  } else if (filter.category === 'collaborator') {
+    const collaboratorSummary = document.getElementById('collaborator-summary');
+    if (collaboratorSummary) {
+      collaboratorSummary.classList.add('active-filter');
+    }
+    if (collaboratorLabel) collaboratorLabel.classList.add('hidden');
+    if (collaboratorPublicToggle) collaboratorPublicToggle.classList.remove('hidden');
+    if (collaboratorPrivateToggle) collaboratorPrivateToggle.classList.remove('hidden');
+    if (filter.visibility === 'public') {
+      document.getElementById('collaborator-public-toggle')?.classList.add('active-filter');
+    } else if (filter.visibility === 'private') {
+      document.getElementById('collaborator-private-toggle')?.classList.add('active-filter');
+    } else {
+      document.getElementById('collaborator-public-toggle')?.classList.add('active-filter');
+      document.getElementById('collaborator-private-toggle')?.classList.add('active-filter');
+    }
+  } else {
+    const personalSummary = document.getElementById('personal-summary');
+    const collaboratorSummary = document.getElementById('collaborator-summary');
+    if (personalSummary) personalSummary.classList.remove('active-filter');
+    if (collaboratorSummary) collaboratorSummary.classList.remove('active-filter');
+  }
+}
+
+function setupRepoToggle(
+  summaryId: string,
+  category: 'personal' | 'collaborator',
+  githubStats: GitHubStats
+) {
+  const summaryElement = document.getElementById(summaryId);
+  const publicToggle = document.getElementById(`${category}-public-toggle`);
+  const privateToggle = document.getElementById(`${category}-private-toggle`);
+
+  if (summaryElement && publicToggle && privateToggle) {
+    summaryElement.addEventListener('click', () => {
+      if (currentActiveFilter.category === category && currentActiveFilter.visibility === 'total') {
+        updateDisplayedStats(githubStats, { category: 'overall', visibility: 'total' });
       } else {
-        window.addEventListener('scroll', animateOnScroll);
+        updateDisplayedStats(githubStats, { category: category, visibility: 'total' });
       }
-      
-      const toggleButton = document.getElementById('toggle-languages');
-      const extraLanguages = document.getElementById('extra-languages');
-      const toggleText = document.getElementById('toggle-text');
-      const toggleArrow = document.getElementById('toggle-arrow');
-      
-      if (toggleButton && extraLanguages && toggleText && toggleArrow) {
-        let isExpanded = false;
-        const remainingCount = githubStats.languages ? githubStats.languages.length - 5 : 0;
-        let hasAnimated = false;
-        
-        toggleButton.addEventListener('click', () => {
-          isExpanded = !isExpanded;
-          
-          if (isExpanded) {
-            extraLanguages.style.maxHeight = '96rem';
-            toggleText.textContent = 'Collapse';
-            toggleArrow.style.transform = 'rotate(180deg)';
-            
-            if (!hasAnimated) {
-              setTimeout(() => {
-                animateExtraLanguages();
-                hasAnimated = true;
-              }, 100);
-            }
-          } else {
-            extraLanguages.style.maxHeight = '0';
-            
-            extraLanguages.addEventListener('transitionend', function handler() {
-              if (!isExpanded) {
-                toggleText.textContent = `Show ${remainingCount} more languages`;
-                toggleArrow.style.transform = 'rotate(0deg)';
-              }
-              extraLanguages.removeEventListener('transitionend', handler);
-            });
-          }
-        });
+    });
+
+    publicToggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (currentActiveFilter.category === category && currentActiveFilter.visibility === 'public') {
+        updateDisplayedStats(githubStats, { category: category, visibility: 'total' });
+      } else {
+        updateDisplayedStats(githubStats, { category: category, visibility: 'public' });
       }
+    });
+
+    privateToggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (currentActiveFilter.category === category && currentActiveFilter.visibility === 'private') {
+        updateDisplayedStats(githubStats, { category: category, visibility: 'total' });
+      } else {
+        updateDisplayedStats(githubStats, { category: category, visibility: 'private' });
+      }
+    });
+  }
+}
+
+
+function renderGitHubStats(githubStats: GitHubStats) {
+  const contentElement = document.getElementById('github-stats-content');
+  if (!contentElement) return;
+
+  contentElement.innerHTML = buildStatsContent(GITHUB_USERNAME);
+  contentElement.classList.remove('hidden');
+
+  const lastUpdatedElement = document.getElementById('last-updated-time');
+  if (lastUpdatedElement) {
+    lastUpdatedElement.textContent = `Last updated: ${new Date(githubStats.lastUpdated).toLocaleDateString()}`;
+  }
+
+  const animateOnScrollFixed = () => {
+    if (isInViewport(contentElement)) {
+      initFixedAnimations(githubStats);
+      window.removeEventListener('scroll', animateOnScrollFixed);
     }
-  } catch (error) {
-    console.error('Error loading GitHub stats:', error);
-    const loadingElement = document.getElementById('github-stats-loading');
-    if (loadingElement) {
-      loadingElement.classList.add('hidden');
-    }
+  };
+  if (isInViewport(contentElement)) {
+    initFixedAnimations(githubStats);
+  } else {
+    window.addEventListener('scroll', animateOnScrollFixed);
+  }
+  
+  const languageSection = document.getElementById('language-stats-section');
+  if (languageSection) {
+    const overallLanguages = githubStats.languages.overall || [];
+    languageSection.innerHTML = buildLanguageStatsHtml(overallLanguages);
     
-    const contentElement = document.getElementById('github-stats-content');
+    const langList = document.getElementById('language-stats-list');
+    const toggleContainer = document.getElementById('language-toggle-container');
+
+    if (langList && toggleContainer) {
+      autoAnimate(langList);
+      updateLanguageDisplay(langList, overallLanguages);
+      updateLanguageToggle(toggleContainer, langList, overallLanguages);
+    }
+  }
+
+  updateDisplayedStats(githubStats, { category: 'overall', visibility: 'total' });
+
+  setupRepoToggle('personal-summary', 'personal', githubStats);
+  setupRepoToggle('collaborator-summary', 'collaborator', githubStats);
+}
+
+export async function initializeGitHubStats(): Promise<void> {
+  const loadingElement = document.getElementById('github-stats-loading');
+  const contentElement = document.getElementById('github-stats-content');
+  
+  try {
+    const githubStats = await fetchGitHubStats();
+    
+    if (loadingElement) loadingElement.classList.add('hidden');
+    
+    renderGitHubStats(githubStats);
+
+  } catch (error) {
+    console.error('Error initializing GitHub stats view:', error);
+    if (loadingElement) loadingElement.classList.add('hidden');
+    
     if (contentElement) {
-      contentElement.innerHTML = `
-        <div class="text-center py-8">
-          <p class="text-red-600 dark:text-red-400">Failed to load GitHub statistics</p>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">The stats will be available when the API is accessible</p>
-          <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">Error: ${(error as Error).message}</p>
-        </div>
-      `;
+      contentElement.innerHTML = buildErrorContent(error);
       contentElement.classList.remove('hidden');
     }
   }
