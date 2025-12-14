@@ -99,11 +99,11 @@ export function buildStatsContent(githubUsername: string): string {
           <div id="personal-label" class="pl-3 py-1">
             <span>Personal:</span>
           </div>
-          <div id="personal-public-toggle" class="personal-details cursor-pointer bg-blue-50 dark:bg-blue-800 text-blue-700 dark:text-blue-100 rounded-md px-3 py-1 text-sm inline-block">
+          <div id="personal-public-toggle" class="personal-details cursor-pointer bg-blue-50 dark:bg-blue-800 text-blue-700 dark:text-blue-100 rounded-md px-3 py-1 text-sm inline-block hidden">
             Public: <span id="personal-public-repos">0</span>
           </div>
           <div id="personal-repos-total" class="px-2">0</div>
-          <div id="personal-private-toggle" class="personal-details cursor-pointer bg-blue-50 dark:bg-blue-800 text-blue-700 dark:text-blue-100 rounded-md px-3 py-1 text-sm inline-block">
+          <div id="personal-private-toggle" class="personal-details cursor-pointer bg-blue-50 dark:bg-blue-800 text-blue-700 dark:text-blue-100 rounded-md px-3 py-1 text-sm inline-block hidden">
             Private: <span id="personal-private-repos">0</span>
           </div>
         </div>
@@ -115,11 +115,11 @@ export function buildStatsContent(githubUsername: string): string {
             <div id="collaborator-label" class="pl-3 py-1">
               <span id="collaborator-label">Collaborator:</span>
             </div>
-            <div id="collaborator-public-toggle" class="collaborator-details cursor-pointer bg-green-50 dark:bg-green-800 text-green-700 dark:text-green-100 rounded-md px-3 py-1 text-sm inline-block">
+            <div id="collaborator-public-toggle" class="collaborator-details cursor-pointer bg-green-50 dark:bg-green-800 text-green-700 dark:text-green-100 rounded-md px-3 py-1 text-sm inline-block hidden">
               Public: <span id="collaborator-public-repos">0</span>
             </div>
             <div id="collaborator-repos-total" class="px-2">0</div>
-            <div id="collaborator-private-toggle" class="collaborator-details cursor-pointer bg-green-50 dark:bg-green-800 text-green-700 dark:text-green-100 rounded-md px-3 py-1 text-sm inline-block">
+            <div id="collaborator-private-toggle" class="collaborator-details cursor-pointer bg-green-50 dark:bg-green-800 text-green-700 dark:text-green-100 rounded-md px-3 py-1 text-sm inline-block hidden">
               Private: <span id="collaborator-private-repos">0</span>
             </div>
           </div>

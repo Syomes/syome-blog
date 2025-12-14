@@ -28,10 +28,10 @@ function updateLanguageToggle(container: HTMLElement, listElement: HTMLElement, 
     const remainingCount = languages.length - 5;
     const button = document.createElement('button');
     button.className = 'text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 flex items-center justify-between w-full py-2 mt-2';
-    
+
     const textSpan = document.createElement('span');
     textSpan.textContent = isLangStatsExpanded ? 'Collapse' : `Show ${remainingCount} more languages`;
-    
+
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'w-4 h-4 transition-transform duration-300');
     svg.setAttribute('fill', 'none');
@@ -72,7 +72,7 @@ function updateLanguageDisplay(listElement: HTMLElement, languages: Language[]) 
 
       if (percentEl) animateNumber(percentEl, lang.percentage, 2, 1000, true, oldPercent);
       if (progressBarEl) animateProgressBar(progressBarEl, lang.percentage, 1000, oldWidth);
-      
+
       existingElements.delete(lang.name);
     } else {
       itemElement = createLanguageItemElement(lang);
@@ -88,7 +88,7 @@ function updateLanguageDisplay(listElement: HTMLElement, languages: Language[]) 
 }
 
 
-function initFixedAnimations(githubStats: GitHubStats) {
+function initAnimations(githubStats: GitHubStats) {
   animateNumber(document.getElementById('contributions-count'), githubStats.contributions || 0, 0);
   animateNumber(document.getElementById('repositories-count'), githubStats.repositories.overall || 0, 0);
   animateNumber(document.getElementById('prs-count'), githubStats.pullRequests.overall || 0, 0);
@@ -96,12 +96,32 @@ function initFixedAnimations(githubStats: GitHubStats) {
 
   animateNumber(document.getElementById('personal-repos-total'), githubStats.repositories.personal.total || 0, 0);
   animateNumber(document.getElementById('collaborator-repos-total'), githubStats.repositories.collaborator.total || 0, 0);
-  
+
   animateNumber(document.getElementById('personal-public-repos'), githubStats.repositories.personal.public || 0, 0);
   animateNumber(document.getElementById('personal-private-repos'), githubStats.repositories.personal.private || 0, 0);
-  
+
   animateNumber(document.getElementById('collaborator-public-repos'), githubStats.repositories.collaborator.public || 0, 0);
   animateNumber(document.getElementById('collaborator-private-repos'), githubStats.repositories.collaborator.private || 0, 0);
+
+  const languageSection = document.getElementById('language-stats-section');
+  if (languageSection) {
+    const overallLanguages = githubStats.languages.overall || [];
+    languageSection.innerHTML = buildLanguageStatsHtml(overallLanguages);
+
+    const langList = document.getElementById('language-stats-list');
+    const toggleContainer = document.getElementById('language-toggle-container');
+
+    if (langList && toggleContainer) {
+      autoAnimate(langList);
+      updateLanguageDisplay(langList, overallLanguages);
+      updateLanguageToggle(toggleContainer, langList, overallLanguages);
+    }
+  }
+
+  updateDisplayedStats(githubStats, { category: 'overall', visibility: 'total' });
+
+  setupRepoToggle('personal-summary', 'personal', githubStats);
+  setupRepoToggle('collaborator-summary', 'collaborator', githubStats);
 }
 
 function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
@@ -274,7 +294,10 @@ function setupRepoToggle(
 
 
 function renderGitHubStats(githubStats: GitHubStats) {
+  const loadingElement = document.getElementById('github-stats-loading');
   const contentElement = document.getElementById('github-stats-content');
+
+  if (loadingElement) loadingElement.classList.add('hidden');
   if (!contentElement) return;
 
   contentElement.innerHTML = buildStatsContent(GITHUB_USERNAME);
@@ -285,57 +308,39 @@ function renderGitHubStats(githubStats: GitHubStats) {
     lastUpdatedElement.textContent = `Last updated: ${new Date(githubStats.lastUpdated).toLocaleDateString()}`;
   }
 
-  const animateOnScrollFixed = () => {
+  const animateOnScroll = () => {
     if (isInViewport(contentElement)) {
-      initFixedAnimations(githubStats);
-      window.removeEventListener('scroll', animateOnScrollFixed);
+      initAnimations(githubStats);
+      window.removeEventListener('scroll', animateOnScroll);
     }
   };
   if (isInViewport(contentElement)) {
-    initFixedAnimations(githubStats);
+    initAnimations(githubStats);
   } else {
-    window.addEventListener('scroll', animateOnScrollFixed);
+    window.addEventListener('scroll', animateOnScroll);
   }
-  
-  const languageSection = document.getElementById('language-stats-section');
-  if (languageSection) {
-    const overallLanguages = githubStats.languages.overall || [];
-    languageSection.innerHTML = buildLanguageStatsHtml(overallLanguages);
-    
-    const langList = document.getElementById('language-stats-list');
-    const toggleContainer = document.getElementById('language-toggle-container');
+}
 
-    if (langList && toggleContainer) {
-      autoAnimate(langList);
-      updateLanguageDisplay(langList, overallLanguages);
-      updateLanguageToggle(toggleContainer, langList, overallLanguages);
-    }
+function renderError(error: unknown) {
+  const loadingElement = document.getElementById('github-stats-loading');
+  const contentElement = document.getElementById('github-stats-content');
+
+  if (loadingElement) loadingElement.classList.add('hidden');
+
+  if (contentElement) {
+    contentElement.innerHTML = buildErrorContent(error);
+    contentElement.classList.remove('hidden');
   }
-
-  updateDisplayedStats(githubStats, { category: 'overall', visibility: 'total' });
-
-  setupRepoToggle('personal-summary', 'personal', githubStats);
-  setupRepoToggle('collaborator-summary', 'collaborator', githubStats);
 }
 
 export async function initializeGitHubStats(): Promise<void> {
-  const loadingElement = document.getElementById('github-stats-loading');
-  const contentElement = document.getElementById('github-stats-content');
-  
+
+
   try {
     const githubStats = await fetchGitHubStats();
-    
-    if (loadingElement) loadingElement.classList.add('hidden');
-    
     renderGitHubStats(githubStats);
-
   } catch (error) {
     console.error('Error initializing GitHub stats view:', error);
-    if (loadingElement) loadingElement.classList.add('hidden');
-    
-    if (contentElement) {
-      contentElement.innerHTML = buildErrorContent(error);
-      contentElement.classList.remove('hidden');
-    }
+    renderError(error);
   }
 }
