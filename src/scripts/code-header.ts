@@ -55,17 +55,33 @@ function addCodeHeader() {
       button.addEventListener('click', () => {
         const text = code.innerText;
         const originalText = button.textContent;
+        button.disabled = true;
+        button.style.cursor = 'not-allowed';
         button.textContent = 'Copied!';
+        button.classList.add('bg-gray-800', 'cursor-not-allowed');
+        button.classList.remove('hover:bg-gray-600');
 
         navigator.clipboard.writeText(text).then(() => {
           setTimeout(() => {
+            button.disabled = false;
+            button.style.cursor = 'pointer';
             button.textContent = originalText;
+            button.classList.remove('bg-gray-800', 'cursor-not-allowed');
+            button.classList.add('hover:bg-gray-600');
           }, 2000);
         }).catch(err => {
           console.error('[addCopyButtons] Failed to copy text: ', err);
+          button.disabled = true;
+          button.style.cursor = 'not-allowed';
           button.textContent = 'Failed';
+          button.classList.add('bg-gray-800', 'cursor-not-allowed');
+          button.classList.remove('hover:bg-gray-600');
           setTimeout(() => {
+            button.disabled = false;
+            button.style.cursor = 'pointer';
             button.textContent = originalText;
+            button.classList.remove('bg-gray-800', 'cursor-not-allowed');
+            button.classList.add('hover:bg-gray-600');
           }, 2000);
         });
       });
