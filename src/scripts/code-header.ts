@@ -1,4 +1,4 @@
-function addCopyButtons() {
+function addCodeHeader() {
   const codeBlocks = document.querySelectorAll('pre');
 
   codeBlocks.forEach((block) => {
@@ -89,9 +89,9 @@ function addCopyButtons() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addCopyButtons);
+  document.addEventListener('DOMContentLoaded', addCodeHeader);
 } else {
-  addCopyButtons();
+  addCodeHeader();
 }
 
-export default addCopyButtons;
+export default addCodeHeader;

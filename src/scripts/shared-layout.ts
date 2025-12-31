@@ -1,4 +1,4 @@
-import addCopyButtons from './code-copy';
+import addCodeHeader from './code-header';
 
 function decodeHTML(html: string): string {
   const txt = document.createElement("textarea");
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  addCopyButtons();
+  addCodeHeader();
 
   setTimeout(() => {
     if (loader) {
