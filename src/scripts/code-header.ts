@@ -31,6 +31,12 @@ function addCodeHeader() {
     toolbar.style.fontWeight = '600';
     toolbar.style.borderTopLeftRadius = '0.375rem';
     toolbar.style.borderTopRightRadius = '0.375rem';
+
+    const siteHeader = document.querySelector('.site-header') as HTMLElement;
+    const siteHeaderHeight = siteHeader?.offsetHeight || 0;
+    toolbar.style.position = 'sticky';
+    toolbar.style.top = siteHeaderHeight + 'px';
+    toolbar.style.zIndex = '20';
     
     const languageLabel = document.createElement('span');
     languageLabel.textContent = language;
