@@ -64,7 +64,8 @@ syome-blog/
 - `npm run preview` - Previews the built project locally
 - `npm run astro` - Runs Astro CLI commands
 
-## 🌐 Deployment to GitHub Pages
+## 🌐 Deployment
+### Deploy using GitHub Pages
 
 To deploy your blog to GitHub Pages, follow these steps:
 
@@ -88,6 +89,15 @@ To deploy your blog to GitHub Pages, follow these steps:
    ```
 
 Make sure to replace `your-username` with your actual GitHub username and `your-repo-name` with your repository name.
+
+### Deploy using Vercel
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Syomes/syome-blog/)
+
+Click the button above to deploy this project to **Vercel**. After deployment, make sure to configure the following environment variables in **Settings > Environment Variables**
+
+Then add these items:
+- `GITHUB_TOKEN`: Your github token
+- `PUBLIC_GITHUB_USERNAME`: Your github username
 
 ## 🎨 Features
 
