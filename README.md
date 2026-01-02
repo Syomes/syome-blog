@@ -5,7 +5,7 @@
   </a>
 </p>
 
-This is my personal static blog built with [Astro](https://astro.build/). Mainly for notes, rambling, experiments, and occasional rants.
+This is my personal static blog built with [Astro](https://astro.build/). Mainly for notes, rambling, experiments, and occasional rants. Here I turned it into a template and feel free to use.
 
 ## ✨ Tech Stack
 
@@ -19,7 +19,7 @@ To get this project up and running locally:
 ### Prerequisites
 
 - Node.js (version 16 or higher)
-- npm or yarn
+- npm or yarn or others(here shows npm)
 
 ### Installation
 
@@ -34,13 +34,13 @@ To get this project up and running locally:
    ```
 
 > [!NOTE]
-> You should update the `.env` file just like `.env.template`. \
+> You should create the `.env` file just like `.env.template`. \
 > For more info of `GITHUB_TOKEN`, you can follow [this guide](token-generate.md) (Please create a GitHub token with the `repo` scope to use all features).
 
 ## 📁 Project Structure
 
 ```
-SyomeBlog/
+syome-blog/
 ├── src/
 │   ├── components/        # Reusable components
 │   ├── content/           # Markdown content (blog posts, etc.)
@@ -108,13 +108,16 @@ This blog includes a GitHub stats feature that displays various statistics about
 
 1. **Contributions** - Total contribution count across all years
 2. **Repositories** - Breakdown of your repositories:
-   - Public repositories you own
-   - Private repositories you own
-   - Repositories you collaborate on (where you're the owner)
+   - Repositories you own
+   - Repositories you collaborate on
 3. **Stars** - Total stars across all your non-fork repositories
 4. **Pull Requests** - Total pull requests you've created
 5. **Issues** - Total issues you've created
 6. **Languages** - Breakdown of programming languages used in your repositories
+
+**Statistics can now be switched to different categories: `Personal`, `Collaborator` and their `public`, `private` ones!**
+
+---
 
 The GitHub stats are fetched from the client side by making a request to `/api/github-stats`, which is an Astro API route that communicates with GitHub's GraphQL and REST APIs.
 
