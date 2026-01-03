@@ -59,11 +59,6 @@
   filter: blur(2px);
 }
 
-.floating-image {
-  animation: avatar-float 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  transform: translate(0, 0) scale(1.05);
-}
-
 @keyframes avatar-softPulse {
   0% {
     transform: scale(1);
@@ -81,35 +76,5 @@
     transform: scale(1);
     opacity: 0.5;
     background-position: 0% 50%;
-  }
-}
-
-@keyframes avatar-float {
-  0% {
-    transform: translate(0, 0) scale(1.05);
-  }
-
-  15% {
-    transform: translate(-1px, -0.5px) scale(1.05);
-  }
-
-  30% {
-    transform: translate(0.5px, -1px) scale(1.055);
-  }
-
-  45% {
-    transform: translate(1px, 0.5px) scale(1.045);
-  }
-
-  60% {
-    transform: translate(-0.5px, 1px) scale(1.06);
-  }
-
-  75% {
-    transform: translate(-1px, -0.5px) scale(1.05);
-  }
-
-  100% {
-    transform: translate(0, 0) scale(1.05);
   }
 }
