@@ -54,6 +54,8 @@ const serializedRepos = sortedRepos.map(repo => ({
 <script src="../../scripts/shared-layout"></script>
 
 <script is:inline define:vars={{ serializedRepos }}>
+  let pageLoaded = false;
+
   document.addEventListener('DOMContentLoaded', () => {
     const reposContainer = document.getElementById('repos-container');
     const paginationContainer = document.getElementById('pagination-container');
@@ -123,7 +125,10 @@ const serializedRepos = sortedRepos.map(repo => ({
       
       setTimeout(() => {
         applyCardAnimations();
-      }, 1000);
+        pageLoaded = true;
+      }, (() => {
+        return pageLoaded ? 100 : 1000;
+      })());
     }
     
     function applyCardAnimations() {

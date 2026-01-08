@@ -54,6 +54,8 @@ const serializedPosts = sortedPosts.map(post => ({
 
 <script src="../../scripts/shared-layout"></script>
 <script is:inline define:vars={{ serializedPosts }}>
+  let pageLoaded = false;
+
   document.addEventListener('DOMContentLoaded', () => {
     const blogPostsContainer = document.getElementById('blog-posts-container');
     const paginationContainer = document.getElementById('pagination-container');
@@ -123,7 +125,10 @@ const serializedPosts = sortedPosts.map(post => ({
       
       setTimeout(() => {
         applyCardAnimations();
-      }, 1000);
+        pageLoaded = true;
+      }, (() => {
+        return pageLoaded ? 100 : 1000;
+      })());
     }
     
     function applyCardAnimations() {
