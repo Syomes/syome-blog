@@ -5,7 +5,7 @@
   </a>
 </p>
 
-This is my personal static blog built with [Astro](https://astro.build/). Mainly for notes, rambling, experiments, and occasional rants. Here I turned it into a template and feel free to use.
+This is my personal static blog built with [Astro](https://astro.build/), mainly for notes, rambling, experiments, and occasional rants. Here I turned it into a template and feel free to use.
 
 ## ✨ Tech Stack
 
