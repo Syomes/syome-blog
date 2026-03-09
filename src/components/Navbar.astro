@@ -23,22 +23,26 @@ const {
 
 <nav class="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
   <div class="max-w-3xl mx-auto px-4 py-3">
-    <div class="flex justify-between items-center">
-      <a href="/" class="text-xl font-bold text-gray-800 dark:text-white">{siteName}</a>
+    <div class="relative flex justify-between items-center">
+      <a href="/" class="text-xl font-bold text-gray-800 dark:text-white">
+        {siteName}
+      </a>
+
       {avatarImage && (
-        <div class="absolute left-1/2 transform -translate-x-1/2">
-          <div class="avatar-container">
-            <div class="w-16 h-16 rounded-full shadow-lg overflow-hidden soft-border">
-              <img src={typeof avatarImage === 'string' ? avatarImage : avatarImage.src} alt={avatarAlt} class="w-full h-full object-cover" width="64" height="64" />
-            </div>
+        <div class="absolute left-1/2 -translate-x-1/2">
+          <div class="w-16 h-16 rounded-full shadow-lg overflow-hidden soft-border">
+            <img src={typeof avatarImage === 'string' ? avatarImage : avatarImage.src}
+                alt={avatarAlt}
+                class="w-full h-full object-cover" />
           </div>
         </div>
       )}
-      <ul class="flex space-x-6 text-sm">
+
+      <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm max-w-[calc(50%-2rem)] justify-end">
         {menuItems.map((item) => (
           <li>
             <a href={item.link} class="flex items-center space-x-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors font-medium">
-              <svg class="w-6 h-6 pr-1" fill="none" stroke="currentColor" viewBox="-3 -3 28 28" xmlns="http://www.w3.org/2000/svg">
+              <svg class="w-6 h-6 pr-1" fill="none" stroke="currentColor" viewBox="-3 -3 28 28">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={item.iconPath}></path>
               </svg>
               {item.name}
