@@ -57,3 +57,17 @@ blockquote p::before,
 blockquote p::after {
   content: none !important;
 }
+
+@keyframes heading-flash {
+  0% {
+    background-color: rgba(59, 130, 246, 0.25);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.heading-highlight {
+  animation: heading-flash 1s ease-out;
+  border-radius: 0.375rem;
+}
