@@ -3,7 +3,6 @@ import "../styles/page.css";
 import MarkdownRenderer from '../components/MarkdownRenderer.astro';
 import Footer from '../components/Footer.astro';
 import siteConfig from '../custom/site-config';
-import Bubbles from "../components/Bubbles.astro";
 const { title, description, pubDate, content } = Astro.props;
 ---
 
@@ -20,14 +19,16 @@ const { title, description, pubDate, content } = Astro.props;
 		<meta name="description" content={description} />
 	</head>
 
-	<body class="h-full bg-white dark:bg-gray-900">
+	<body class="h-full">
 		<div class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center page-loader">
 			<div class="text-2xl font-bold text-gray-800 dark:text-white loader-text">Loading...</div>
 		</div>
 
-		<div class="fixed inset-0 z-[-1] bg-gradient-to-br from-white to-gray-200 dark:from-gray-800 dark:to-gray-900"></div>
-
-		<Bubbles />
+		<iframe 
+			src={siteConfig.backgroundUrl} 
+			class="fixed inset-0 z-[-1] w-full h-full border-none pointer-events-none"
+			title="background"
+		></iframe>
 
 		<div class="min-h-screen flex flex-col">
 			<header class="site-header sticky top-0 z-30 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700">

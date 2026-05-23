@@ -22,6 +22,10 @@ const siteConfig = {
      */
     mediaPath: ''
   },
+  /**
+  * Global background configuration
+  * This will set an iframe as the background for all pages.
+  */
+  backgroundUrl: 'background',
 };
-
 export default siteConfig;

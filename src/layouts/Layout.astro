@@ -1,11 +1,10 @@
 ---
 const { title } = Astro.props;
 import siteConfig from '../custom/site-config';
-import Bubbles from "../components/Bubbles.astro";
 ---
 
 <!doctype html>
-<html lang="en" class="h-full" style="scroll-padding-top: 4.5rem;">
+<html lang="en" class="h-full">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
@@ -13,9 +12,19 @@ import Bubbles from "../components/Bubbles.astro";
 		<meta name="generator" content={Astro.generator} />
 		<title>{siteConfig.siteName} - {title}</title>
 	</head>
-	<body class="h-full bg-white dark:bg-gray-900">
-		<div class="fixed inset-0 z-[-1] bg-gradient-to-br from-white to-gray-200 dark:from-gray-800 dark:to-gray-900"></div>
-		<Bubbles />
+	<body class="h-full" style="background: transparent !important;">
+		<iframe 
+			src={siteConfig.backgroundUrl} 
+			class="fixed inset-0 z-[-10] w-full h-full border-none pointer-events-none"
+			style="background: transparent;"
+			title="background"
+		></iframe>
 		<slot />
 	</body>
 </html>
+
+<style is:global>
+	html, body {
+		background: transparent !important;
+	}
+</style>
