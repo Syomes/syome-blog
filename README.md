@@ -1,4 +1,4 @@
-# 🛠️ Syome Blog
+# Syome Blog
 <p align="center">
   <a href="https://www.syome.top/" target="_blank">
     <img src="https://img.shields.io/badge/visit%20syome-view-88C0D0?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Website"/>
@@ -7,12 +7,12 @@
 
 This is my personal static blog built with [Astro](https://astro.build/), mainly for notes, rambling, experiments, and occasional rants. Here I turned it into a template and feel free to use.
 
-## ✨ Tech Stack
+## Tech Stack
 
 - **[Astro](https://astro.build/)** - Static site generator
 - **[TailwindCSS](https://tailwindcss.com/)** - Utility-first CSS framework
 
-## 📦 Getting Started
+## Getting Started
 
 To get this project up and running locally:
 
@@ -37,7 +37,7 @@ To get this project up and running locally:
 > You should create the `.env` file just like `.env.template`. \
 > For more info of `GITHUB_TOKEN`, you can follow [this guide](token-generate.md) (Please create a GitHub token with the `repo` scope to use all features).
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 syome-blog/
@@ -57,14 +57,14 @@ syome-blog/
 └── README.md
 ```
 
-## 🚀 Available Scripts
+## Available Scripts
 
 - `npm run dev` - Starts the development server
 - `npm run build` - Builds the project for production
 - `npm run preview` - Previews the built project locally
 - `npm run astro` - Runs Astro CLI commands
 
-## 🌐 Deployment
+## Deployment
 ### Deploy using GitHub Pages
 
 To deploy your blog to GitHub Pages, follow these steps:
@@ -99,7 +99,7 @@ Then add these items:
 - `GITHUB_TOKEN`: Your github token
 - `PUBLIC_GITHUB_USERNAME`: Your github username
 
-## 🎨 Features
+## Features
 
 ### Custom Contents
 This blog template includes a custom section for adding custom contents to the blog. You can add your own information, contents, etc. in the `src/custom/` directory.
@@ -133,7 +133,7 @@ The GitHub stats are fetched from the client side by making a request to `/api/g
 
 Note that the repository counts only include `non-fork repositories` you own or collaborate on. The current implementation does not include repositories you've contributed to but don't own or collaborate on, which provides a more focused view of your direct work rather than all contributions.
 
-## 🛠️ Post Guidelines
+## Post Guidelines
 
 ### Markdown Content
 
@@ -159,6 +159,6 @@ Styling is done with Tailwind CSS. Custom styles should be added to component fi
 
 Reusable components are located in `src/components/`. Each component should be self-contained and well-documented.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

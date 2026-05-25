@@ -1,10 +1,13 @@
 ---
-import siteConfig from '../custom/site-config';
+import siteConfig from "../custom/site-config";
+import "../custom/theme.css";
 ---
 
-<section class="py-8 text-center border-b border-gray-200 dark:border-gray-700">
-  <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Hi there, I'm {siteConfig.author}!</h2>
-  <p class="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto" style="white-space: pre-line;">
+<section class="border-container py-8 text-center border-b">
+  <h2 class="text-main text-2xl font-bold mb-4">
+    Hi there, I'm {siteConfig.author}!
+  </h2>
+  <p class="text-tips text-lg max-w-2xl mx-auto" style="white-space: pre-line;">
     {siteConfig.authorGreet}
   </p>
 </section>

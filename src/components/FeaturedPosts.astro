@@ -1,60 +1,93 @@
 ---
-import { getCollection } from 'astro:content';
+import "../custom/theme.css";
+import { getCollection } from "astro:content";
 
-const posts = await getCollection('posts');
-const pinnedPosts = posts.filter(post => post.data.pin);
+const posts = await getCollection("posts");
+const pinnedPosts = posts.filter((post) => post.data.pin);
 if (pinnedPosts.length > 1) {
-  console.warn('\x1b[33m%s\x1b[0m', `[WARNING]: ${pinnedPosts.length} posts are pinned. Only the first one will be featured.`);
-  console.warn('\x1b[33m%s\x1b[0m', `Pinned posts: ${pinnedPosts.map(p => p.data.title).join(', ')}`);
+  console.warn(
+    "\x1b[33m%s\x1b[0m",
+    `[WARNING]: ${pinnedPosts.length} posts are pinned. Only the first one will be featured.`,
+  );
+  console.warn(
+    "\x1b[33m%s\x1b[0m",
+    `Pinned posts: ${pinnedPosts.map((p) => p.data.title).join(", ")}`,
+  );
 }
-const sortedPosts = pinnedPosts.length > 0 ? pinnedPosts : posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedPosts =
+  pinnedPosts.length > 0
+    ? pinnedPosts
+    : posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const latestPost = sortedPosts[0];
 
-const repos = await getCollection('repos');
-const pinnedRepos = repos.filter(repo => repo.data.pin);
+const repos = await getCollection("repos");
+const pinnedRepos = repos.filter((repo) => repo.data.pin);
 if (pinnedRepos.length > 1) {
-  console.warn('\x1b[33m%s\x1b[0m', `[WARNING]: ${pinnedRepos.length} repos are pinned. Only the first one will be featured.`);
-  console.warn('\x1b[33m%s\x1b[0m', `Pinned repos: ${pinnedRepos.map(r => r.data.title).join(', ')}`);
+  console.warn(
+    "\x1b[33m%s\x1b[0m",
+    `[WARNING]: ${pinnedRepos.length} repos are pinned. Only the first one will be featured.`,
+  );
+  console.warn(
+    "\x1b[33m%s\x1b[0m",
+    `Pinned repos: ${pinnedRepos.map((r) => r.data.title).join(", ")}`,
+  );
 }
-const sortedRepos = pinnedRepos.length > 0 
-  ? pinnedRepos 
-  : repos.sort((a, b) => b.slug.localeCompare(a.slug));
+const sortedRepos =
+  pinnedRepos.length > 0
+    ? pinnedRepos
+    : repos.sort((a, b) => b.slug.localeCompare(a.slug));
 const latestRepo = sortedRepos.length > 0 ? sortedRepos[0] : null;
 ---
 
 <section class="mt-12">
-  <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recommended Reading</h2>
-  
+  <h2 class="text-main text-2xl font-bold mb-6">Recommended Reading</h2>
+
   {
-    !latestPost && !latestRepo
-      ? (<div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No content yet</h3>
-          <p class="text-gray-600 dark:text-gray-400">Check back later for recommended posts and projects.</p>
-        </div>)
-      : (<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {latestPost && (
-            <article class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{latestPost.data.title}</h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-4">
-                {latestPost.data.description}
-              </p>
-              <a href={`/posts/${latestPost.slug}`} class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
-                Read more →
-              </a>
-            </article>
-          )}
-          
-          {latestRepo && (
-            <article class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{latestRepo.data.title}</h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-4">
-                {latestRepo.data.description}
-              </p>
-              <a href={`/repos/${latestRepo.slug}`} class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
-                Learn more →
-              </a>
-            </article>
-          )}
-        </div>)
+    !latestPost && !latestRepo ? (
+      <div class="text-tips border rounded-lg p-6 text-center">
+        <h3 class="text-main text-xl font-semibold mb-2">
+          No content yet
+        </h3>
+        <p class="text-tips">
+          Check back later for recommended posts and projects.
+        </p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {latestPost && (
+          <article class="border-container border rounded-lg p-6">
+            <h3 class="text-main text-xl font-semibold mb-2">
+              {latestPost.data.title}
+            </h3>
+            <p class="text-tips mb-4">
+              {latestPost.data.description}
+            </p>
+            <a
+              href={`/posts/${latestPost.slug}`}
+              class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+            >
+              Read more →
+            </a>
+          </article>
+        )}
+
+        {latestRepo && (
+          <article class="border-container border rounded-lg p-6">
+            <h3 class="text-main text-xl font-semibold mb-2">
+              {latestRepo.data.title}
+            </h3>
+            <p class="text-tips mb-4">
+              {latestRepo.data.description}
+            </p>
+            <a
+              href={`/repos/${latestRepo.slug}`}
+              class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+            >
+              Learn more →
+            </a>
+          </article>
+        )}
+      </div>
+    )
   }
 </section>

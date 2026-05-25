@@ -1,0 +1,186 @@
+.text-main {
+  @apply text-gray-900 dark:text-white
+}
+.text-tips {
+  @apply text-gray-600 dark:text-gray-400
+}
+.text-tips-interactive {
+  @apply text-tips hover:text-gray-900 dark:hover:text-gray-300
+}
+.text-micro-tips {
+  @apply text-gray-500 dark:text-gray-500
+}
+.text-link-interactive {
+  @apply text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300
+}
+.text-error {
+  @apply text-red-600 dark:text-red-400
+}
+.text-highlight {
+  @apply text-main bg-yellow-200 dark:bg-yellow-800
+}
+.card-container {
+  @apply rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg
+}
+.border-container {
+  @apply border-gray-200 dark:border-gray-700
+}
+.toggle-active {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+}
+.toggle-inactive {
+  @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700
+}
+.footer {
+  @apply text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50
+}
+.markdown-renderer-article {
+  @apply text-white dark:text-gray-100 prose-pre:bg-gray-800 prose-blockquote:border-l-blue-500 prose-blockquote:dark:border-l-blue-400 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+}
+
+
+.github-stats-total-container {
+  @apply bg-gray-50 dark:bg-gray-600
+}
+#github-stats-loading-icon {
+  @apply border-indigo-600 dark:border-indigo-400
+}
+#github-stats-progress-bar-container {
+  @apply bg-gray-200 dark:bg-gray-600
+}
+#github-stats-progress-bar {
+  @apply bg-indigo-600 dark:bg-indigo-500
+}
+#github-stats-personal-summary {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 transition-colors duration-300 ease-in-out;
+}
+#github-stats-personal-summary:hover:not(:has(#github-stats-personal-public-toggle:hover, #github-stats-personal-private-toggle:hover)) {
+  @apply bg-blue-200 dark:bg-blue-800;
+}
+#github-stats-personal-summary.active-filter {
+  @apply bg-blue-600 text-white dark:bg-blue-800;
+}
+#github-stats-personal-summary.active-filter:hover:not(:has(#github-stats-personal-public-toggle:hover, #github-stats-personal-private-toggle:hover)) {
+  @apply bg-blue-700 dark:bg-blue-900;
+}
+#github-stats-personal-public-toggle,
+#github-stats-personal-private-toggle {
+  @apply bg-blue-50 text-blue-700 dark:bg-blue-800 dark:text-blue-100 transition-colors duration-300 ease-in-out;
+}
+#github-stats-personal-public-toggle:hover,
+#github-stats-personal-private-toggle:hover {
+  @apply bg-blue-100 dark:bg-blue-700;
+}
+#github-stats-personal-public-toggle.active-filter,
+#github-stats-personal-private-toggle.active-filter {
+  @apply bg-blue-400 text-white dark:bg-blue-600;
+}
+#github-stats-personal-public-toggle.active-filter:hover,
+#github-stats-personal-private-toggle.active-filter:hover {
+  @apply bg-blue-500 dark:bg-blue-700;
+}
+#github-stats-collaborator-summary {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 transition-colors duration-300 ease-in-out;
+}
+#github-stats-collaborator-summary:hover:not(:has(#github-stats-collaborator-public-toggle:hover, #github-stats-collaborator-private-toggle:hover)) {
+  @apply bg-green-200 dark:bg-green-800;
+}
+#github-stats-collaborator-summary.active-filter {
+  @apply bg-emerald-600 text-white dark:bg-emerald-800;
+}
+#github-stats-collaborator-summary.active-filter:hover:not(:has(#github-stats-collaborator-public-toggle:hover, #github-stats-collaborator-private-toggle:hover)) {
+  @apply bg-emerald-700 dark:bg-emerald-900;
+}
+#github-stats-collaborator-public-toggle,
+#github-stats-collaborator-private-toggle {
+  @apply bg-green-50 text-green-700 dark:bg-green-800 dark:text-green-100 transition-colors duration-300 ease-in-out;
+}
+#github-stats-collaborator-public-toggle:hover,
+#github-stats-collaborator-private-toggle:hover {
+  @apply bg-green-100 dark:bg-green-700;
+}
+#github-stats-collaborator-public-toggle.active-filter,
+#github-stats-collaborator-private-toggle.active-filter {
+  @apply bg-emerald-400 text-white dark:bg-emerald-600;
+}
+#github-stats-collaborator-public-toggle.active-filter:hover,
+#github-stats-collaborator-private-toggle.active-filter:hover {
+  @apply bg-emerald-500 dark:bg-emerald-700;
+}
+#github-stats-contributions-count {
+  @apply text-indigo-600 dark:text-indigo-400
+}
+#github-stats-repositories-count {
+  @apply text-green-600 dark:text-green-400
+}
+#github-stats-stars-container {
+  @apply bg-blue-50 dark:bg-blue-900
+}
+#github-stats-stars-count {
+  @apply text-blue-600 dark:text-blue-300
+}
+#github-stats-prs-container {
+  @apply bg-purple-50 dark:bg-purple-900
+}
+#github-stats-prs-count {
+  @apply text-purple-600 dark:text-purple-300
+}
+#github-stats-issues-container {
+  @apply bg-yellow-50 dark:bg-yellow-900
+}
+#github-stats-issues-count {
+  @apply text-yellow-600 dark:text-yellow-300
+}
+
+
+.navbar-container {
+  @apply backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-gray-200 dark:border-gray-800
+}
+.navbar-home {
+  @apply text-gray-800 dark:text-white
+}
+.navbar-items {
+  @apply transition-colors text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white
+}
+
+
+.search-bar-input { 
+  @apply text-main bg-white dark:bg-gray-800 focus:ring-blue-500 border border-gray-200 dark:border-gray-700
+}
+.search-bar-icon {
+  @apply text-gray-400 dark:text-gray-500
+}
+
+
+.post-pub-date {
+  @apply text-blue-600 bg-blue-100 rounded-full dark:text-blue-300 dark:bg-blue-900/50
+}
+.post-description {
+  @apply text-gray-600 dark:text-gray-300
+}
+.repo-url {
+  @apply bg-gray-800 text-white hover:bg-gray-700 transition-colors
+}
+.repo-lang {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300
+}
+.post-category {
+  @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300
+}
+.post-return-btn {
+  @apply bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 shadow-lg
+}
+
+
+.code-toolbar {
+  @apply bg-gray-800 text-gray-200
+}
+.code-copy {
+  @apply bg-gray-700 text-white transition-colors
+}
+.code-copy.allowed {
+  @apply hover:bg-gray-600 cursor-pointer
+}
+.code-copy.not-allowed {
+  @apply bg-gray-800 cursor-auto
+}

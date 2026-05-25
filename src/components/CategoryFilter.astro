@@ -1,4 +1,5 @@
 ---
+import "../custom/theme.css";
 interface Props {
   categories: { name: string; count: number }[];
   selectedCategory: string;
@@ -7,36 +8,40 @@ interface Props {
 const { categories, selectedCategory } = Astro.props;
 ---
 
-<div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
-  <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Categories</h2>
+<div class="card-container rounded-2xl p-6 mb-6">
+  <h2 class="text-main text-xl font-semibold mb-4">Categories</h2>
   <ul class="space-y-2">
     <li>
-      <button 
+      <button
         class={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-          selectedCategory === '' 
-            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
-            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+          selectedCategory === ""
+            ? "toggle-active"
+            : "toggle-inactive"
         }`}
         data-category=""
       >
         All Posts
-        <span class="float-right">({categories.reduce((sum, cat) => sum + cat.count, 0)})</span>
+        <span class="float-right"
+          >({categories.reduce((sum, cat) => sum + cat.count, 0)})</span
+        >
       </button>
     </li>
-    {categories.map((category) => (
-      <li>
-        <button 
-          class={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-            selectedCategory === category.name 
-              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
-              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-          }`}
-          data-category={category.name}
-        >
-          {category.name}
-          <span class="float-right">({category.count})</span>
-        </button>
-      </li>
-    ))}
+    {
+      categories.map((category) => (
+        <li>
+          <button
+            class={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+              selectedCategory === category.name
+                ? "toggle-active"
+                : "toggle-inactive"
+            }`}
+            data-category={category.name}
+          >
+            {category.name}
+            <span class="float-right">({category.count})</span>
+          </button>
+        </li>
+      ))
+    }
   </ul>
 </div>

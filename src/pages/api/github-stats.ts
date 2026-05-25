@@ -7,7 +7,7 @@ const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
 
 export const GET: APIRoute = async () => {
   if (!GITHUB_USERNAME || !GITHUB_TOKEN) {
-    console.warn('\x1b[33m%s\x1b[0m', "[WARN]: No GitHub username or token found.\nMay you forget to add it to your .env file?");
+    console.warn('\x1b[33m%s\x1b[0m', "[WARN]: No GitHub username or token found.\nProbably you forgot to add it to the .env file.");
     return new Response(JSON.stringify({ error: 'No GitHub username or token found.' }), {
       status: 401,
       headers: {
@@ -68,7 +68,7 @@ function calculateLanguageStats(repos: any[]): { name: string; percentage: numbe
   if (otherLanguagesPercentage > 0) {
     filteredLanguages.push({ name: 'Other', percentage: otherLanguagesPercentage });
   }
-  
+
   return filteredLanguages;
 }
 
@@ -126,7 +126,7 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
     }
 
     const nonForkRepos = repos.filter(r => !r.isFork);
-    
+
     const ownerRepos = nonForkRepos.filter(repo => repo.owner.login === GITHUB_USERNAME);
     const collaboratorRepos = nonForkRepos.filter(repo => repo.owner.login !== GITHUB_USERNAME);
 
@@ -144,25 +144,25 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
 
     try {
       const [prRes, issueRes] = await Promise.all([
-        fetch(`https://api.github.com/search/issues?q=type:pr+author:${GITHUB_USERNAME}&per_page=100`, { 
-          headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName } 
+        fetch(`https://api.github.com/search/issues?q=type:pr+author:${GITHUB_USERNAME}&per_page=100`, {
+          headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName }
         }),
-        fetch(`https://api.github.com/search/issues?q=type:issue+author:${GITHUB_USERNAME}&per_page=100`, { 
-          headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName } 
+        fetch(`https://api.github.com/search/issues?q=type:issue+author:${GITHUB_USERNAME}&per_page=100`, {
+          headers: { Authorization: `token ${GITHUB_TOKEN}`, 'User-Agent': siteConfig.siteName }
         })
       ]);
 
       if (prRes.ok) {
         const prData = await prRes.json();
-        
+
         for (const item of prData.items || []) {
           const repoFullName = item.repository_url.split('/').slice(-2).join('/');
           const [owner, repoName] = repoFullName.split('/');
-          
+
           const isPersonalRepo = ownerRepos.some(r => r.owner.login === owner && r.name === repoName);
           const isCollaboratorRepo = collaboratorRepos.some(r => r.owner.login === owner && r.name === repoName);
           const isPrivateRepo = [...ownerReposPrivate, ...collaboratorReposPrivate].some(r => r.owner.login === owner && r.name === repoName);
-          
+
           if (isPersonalRepo) {
             if (isPrivateRepo) {
               personalPrCount.private++;
@@ -185,15 +185,15 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
 
       if (issueRes.ok) {
         const issueData = await issueRes.json();
-        
+
         for (const item of issueData.items || []) {
           const repoFullName = item.repository_url.split('/').slice(-2).join('/');
           const [owner, repoName] = repoFullName.split('/');
-          
+
           const isPersonalRepo = ownerRepos.some(r => r.owner.login === owner && r.name === repoName);
           const isCollaboratorRepo = collaboratorRepos.some(r => r.owner.login === owner && r.name === repoName);
           const isPrivateRepo = [...ownerReposPrivate, ...collaboratorReposPrivate].some(r => r.owner.login === owner && r.name === repoName);
-          
+
           if (isPersonalRepo) {
             if (isPrivateRepo) {
               personalIssueCount.private++;

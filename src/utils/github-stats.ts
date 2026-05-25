@@ -27,7 +27,7 @@ function updateLanguageToggle(container: HTMLElement, listElement: HTMLElement, 
   if (languages.length > 5) {
     const remainingCount = languages.length - 5;
     const button = document.createElement('button');
-    button.className = 'text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 flex items-center justify-between w-full py-2 mt-2';
+    button.className = 'text-tips-interactive text-sm flex items-center justify-between w-full py-2 mt-2';
 
     const textSpan = document.createElement('span');
     textSpan.textContent = isLangStatsExpanded ? 'Collapse' : `Show ${remainingCount} more languages`;
@@ -89,10 +89,10 @@ function updateLanguageDisplay(listElement: HTMLElement, languages: Language[]) 
 
 
 function initAnimations(githubStats: GitHubStats) {
-  animateNumber(document.getElementById('contributions-count'), githubStats.contributions || 0, 0);
-  animateNumber(document.getElementById('repositories-count'), githubStats.repositories.overall || 0, 0);
-  animateNumber(document.getElementById('prs-count'), githubStats.pullRequests.overall || 0, 0);
-  animateNumber(document.getElementById('issues-count'), githubStats.issues.overall || 0, 0);
+  animateNumber(document.getElementById('github-stats-contributions-count'), githubStats.contributions || 0, 0);
+  animateNumber(document.getElementById('github-stats-repositories-count'), githubStats.repositories.overall || 0, 0);
+  animateNumber(document.getElementById('github-stats-prs-count'), githubStats.pullRequests.overall || 0, 0);
+  animateNumber(document.getElementById('github-stats-issues-count'), githubStats.issues.overall || 0, 0);
 
   animateNumber(document.getElementById('personal-repos-total'), githubStats.repositories.personal.total || 0, 0);
   animateNumber(document.getElementById('collaborator-repos-total'), githubStats.repositories.collaborator.total || 0, 0);
@@ -120,15 +120,15 @@ function initAnimations(githubStats: GitHubStats) {
 
   updateDisplayedStats(githubStats, { category: 'overall', visibility: 'total' });
 
-  setupRepoToggle('personal-summary', 'personal', githubStats);
-  setupRepoToggle('collaborator-summary', 'collaborator', githubStats);
+  setupRepoToggle('github-stats-personal-summary', 'personal', githubStats);
+  setupRepoToggle('github-stats-collaborator-summary', 'collaborator', githubStats);
 }
 
 function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   currentActiveFilter = filter;
   isLangStatsExpanded = false;
 
-  const starsCountElement = document.getElementById('stars-count');
+  const starsCountElement = document.getElementById('github-stats-stars-count');
   const currentStars = parseFloat(starsCountElement?.textContent?.replace(/,/g, '') || '0');
   let newStarsCount = 0;
   if (filter.category === 'overall') {
@@ -143,7 +143,7 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   }
   animateNumber(starsCountElement, newStarsCount, 0, 1000, false, currentStars);
 
-  const prsCountElement = document.getElementById('prs-count');
+  const prsCountElement = document.getElementById('github-stats-prs-count');
   const currentPrs = parseFloat(prsCountElement?.textContent?.replace(/,/g, '') || '0');
   let newPrsCount = 0;
   if (filter.category === 'overall') {
@@ -158,7 +158,7 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   }
   animateNumber(prsCountElement, newPrsCount, 0, 1000, false, currentPrs);
 
-  const issuesCountElement = document.getElementById('issues-count');
+  const issuesCountElement = document.getElementById('github-stats-issues-count');
   const currentIssues = parseFloat(issuesCountElement?.textContent?.replace(/,/g, '') || '0');
   let newIssuesCount = 0;
   if (filter.category === 'overall') {
@@ -198,10 +198,10 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   const collaboratorLabel = document.getElementById('collaborator-label');
   const personalTotal = document.getElementById('personal-repos-total');
   const collaboratorTotal = document.getElementById('collaborator-repos-total');
-  const personalPublicToggle = document.getElementById('personal-public-toggle');
-  const personalPrivateToggle = document.getElementById('personal-private-toggle');
-  const collaboratorPublicToggle = document.getElementById('collaborator-public-toggle');
-  const collaboratorPrivateToggle = document.getElementById('collaborator-private-toggle');
+  const personalPublicToggle = document.getElementById('github-stats-personal-public-toggle');
+  const personalPrivateToggle = document.getElementById('github-stats-personal-private-toggle');
+  const collaboratorPublicToggle = document.getElementById('github-stats-collaborator-public-toggle');
+  const collaboratorPrivateToggle = document.getElementById('github-stats-collaborator-private-toggle');
 
   if (personalLabel) personalLabel.classList.remove('hidden');
   if (collaboratorLabel) collaboratorLabel.classList.remove('hidden');
@@ -215,7 +215,7 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   document.querySelectorAll('.repo-toggle-container .active-filter').forEach(el => el.classList.remove('active-filter'));
 
   if (filter.category === 'personal') {
-    const personalSummary = document.getElementById('personal-summary');
+    const personalSummary = document.getElementById('github-stats-personal-summary');
     if (personalSummary) {
       personalSummary.classList.add('active-filter');
     }
@@ -223,15 +223,15 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
     if (personalPublicToggle) personalPublicToggle.classList.remove('hidden');
     if (personalPrivateToggle) personalPrivateToggle.classList.remove('hidden');
     if (filter.visibility === 'public') {
-      document.getElementById('personal-public-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-personal-public-toggle')?.classList.add('active-filter');
     } else if (filter.visibility === 'private') {
-      document.getElementById('personal-private-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-personal-private-toggle')?.classList.add('active-filter');
     } else {
-      document.getElementById('personal-public-toggle')?.classList.add('active-filter');
-      document.getElementById('personal-private-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-personal-public-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-personal-private-toggle')?.classList.add('active-filter');
     }
   } else if (filter.category === 'collaborator') {
-    const collaboratorSummary = document.getElementById('collaborator-summary');
+    const collaboratorSummary = document.getElementById('github-stats-collaborator-summary');
     if (collaboratorSummary) {
       collaboratorSummary.classList.add('active-filter');
     }
@@ -239,16 +239,16 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
     if (collaboratorPublicToggle) collaboratorPublicToggle.classList.remove('hidden');
     if (collaboratorPrivateToggle) collaboratorPrivateToggle.classList.remove('hidden');
     if (filter.visibility === 'public') {
-      document.getElementById('collaborator-public-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-collaborator-public-toggle')?.classList.add('active-filter');
     } else if (filter.visibility === 'private') {
-      document.getElementById('collaborator-private-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-collaborator-private-toggle')?.classList.add('active-filter');
     } else {
-      document.getElementById('collaborator-public-toggle')?.classList.add('active-filter');
-      document.getElementById('collaborator-private-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-collaborator-public-toggle')?.classList.add('active-filter');
+      document.getElementById('github-stats-collaborator-private-toggle')?.classList.add('active-filter');
     }
   } else {
-    const personalSummary = document.getElementById('personal-summary');
-    const collaboratorSummary = document.getElementById('collaborator-summary');
+    const personalSummary = document.getElementById('github-stats-personal-summary');
+    const collaboratorSummary = document.getElementById('github-stats-collaborator-summary');
     if (personalSummary) personalSummary.classList.remove('active-filter');
     if (collaboratorSummary) collaboratorSummary.classList.remove('active-filter');
   }
@@ -260,8 +260,8 @@ function setupRepoToggle(
   githubStats: GitHubStats
 ) {
   const summaryElement = document.getElementById(summaryId);
-  const publicToggle = document.getElementById(`${category}-public-toggle`);
-  const privateToggle = document.getElementById(`${category}-private-toggle`);
+  const publicToggle = document.getElementById(`github-stats-${category}-public-toggle`);
+  const privateToggle = document.getElementById(`github-stats-${category}-private-toggle`);
 
   if (summaryElement && publicToggle && privateToggle) {
     summaryElement.addEventListener('click', () => {

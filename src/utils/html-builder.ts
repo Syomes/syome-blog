@@ -9,24 +9,26 @@ export function createLanguageItemElement(language: Language): HTMLElement {
   nameAndPercent.className = 'flex justify-between text-sm mb-1';
 
   const nameSpan = document.createElement('span');
-  nameSpan.className = 'text-gray-700 dark:text-gray-300';
+  nameSpan.className = 'text-tips';
   nameSpan.textContent = language.name;
 
   const percentSpan = document.createElement('span');
-  percentSpan.className = 'text-gray-500 dark:text-gray-400 lang-percent';
+  percentSpan.className = 'text-tips lang-percent';
   percentSpan.textContent = '0.00%';
-  
+
   nameAndPercent.append(nameSpan, percentSpan);
 
   const progressBarContainer = document.createElement('div');
-  progressBarContainer.className = 'w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2';
+  progressBarContainer.id = "github-stats-progress-bar-container";
+  progressBarContainer.className = 'w-full rounded-full h-2';
 
   const progressBar = document.createElement('div');
-  progressBar.className = 'bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full progress-bar';
+  progressBar.id = 'github-stats-progress-bar';
+  progressBar.className = 'h-2 rounded-full progress-bar';
   progressBar.style.width = '0%';
-  
+
   progressBarContainer.appendChild(progressBar);
-  
+
   item.append(nameAndPercent, progressBarContainer);
 
   return item;
@@ -35,7 +37,7 @@ export function createLanguageItemElement(language: Language): HTMLElement {
 export function buildLanguageStatsHtml(languages: Language[]): string {
   if (!languages || languages.length === 0) {
     return `
-      <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+      <div class="text-tips text-center py-4">
         <p>No language data available</p>
       </div>
     `;
@@ -43,17 +45,18 @@ export function buildLanguageStatsHtml(languages: Language[]): string {
 
   return `
     <div>
-      <h4 class="font-medium text-gray-900 dark:text-white mb-2">Language Usage</h4>
+      <h4 class="text-main font-medium mb-2">Language Usage</h4>
       <div class="space-y-2" id="language-stats-list">
         ${languages.slice(0, 5).map(lang => `
           <div class="language-item" data-lang="${lang.name}">
             <div class="flex justify-between text-sm mb-1">
-              <span class="text-gray-700 dark:text-gray-300">${lang.name}</span>
-              <span class="text-gray-500 dark:text-gray-400 lang-percent">0.00%</span>
+              <span class="text-tips">${lang.name}</span>
+              <span class="text-tips lang-percent">0.00%</span>
             </div>
-            <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+            <div id="github-stats-progress-bar-container" class="w-full rounded-full h-2">
               <div
-                class="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full progress-bar"
+                id="github-stats-progress-bar"
+                class="h-2 rounded-full progress-bar"
                 style="width: 0%"
               ></div>
             </div>
@@ -68,58 +71,58 @@ export function buildLanguageStatsHtml(languages: Language[]): string {
 export function buildStatsContent(githubUsername: string): string {
   return `
     <div class="grid grid-cols-2 gap-4 mb-4">
-      <div class="text-center p-3 bg-gray-50 dark:bg-gray-600 rounded-lg">
-        <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400" id="contributions-count">0</p>
-        <p class="text-sm text-gray-600 dark:text-gray-300">Contributions</p>
+      <div class="github-stats-total-container text-center p-3 rounded-lg">
+        <p id="github-stats-contributions-count" class="text-2xl font-bold">0</p>
+        <p class="text-tips text-sm">Contributions</p>
       </div>
-      <div class="text-center p-3 bg-gray-50 dark:bg-gray-600 rounded-lg">
-        <p class="text-2xl font-bold text-green-600 dark:text-green-400" id="repositories-count">0</p>
-        <p class="text-sm text-gray-600 dark:text-gray-300">Total Repositories</p>
+      <div class="github-stats-total-container text-center p-3 rounded-lg">
+        <p id="github-stats-repositories-count" class="text-2xl font-bold">0</p>
+        <p class="text-tips text-sm">Total Repositories</p>
       </div>
     </div>
 
     <div class="grid grid-cols-3 gap-4 mb-4">
-      <div class="text-center p-2 bg-blue-50 dark:bg-blue-900 rounded-lg">
-        <p class="text-xl font-bold text-blue-600 dark:text-blue-300" id="stars-count">0</p>
-        <p class="text-xs text-gray-600 dark:text-gray-300">Stars</p>
+      <div id="github-stats-stars-container" class="text-center p-2 rounded-lg">
+        <p id="github-stats-stars-count" class="text-xl font-bold">0</p>
+        <p class="text-tips text-xs">Stars</p>
       </div>
-      <div class="text-center p-2 bg-purple-50 dark:bg-purple-900 rounded-lg">
-        <p class="text-xl font-bold text-purple-600 dark:text-purple-300" id="prs-count">0</p>
-        <p class="text-xs text-gray-600 dark:text-gray-300">PRs</p>
+      <div id="github-stats-prs-container" class="text-center p-2 rounded-lg">
+        <p id="github-stats-prs-count" class="text-xl font-bold">0</p>
+        <p class="text-tips text-xs">PRs</p>
       </div>
-      <div class="text-center p-2 bg-yellow-50 dark:bg-yellow-900 rounded-lg">
-        <p class="text-xl font-bold text-yellow-600 dark:text-yellow-300" id="issues-count">0</p>
-        <p class="text-xs text-gray-600 dark:text-gray-300">Issues</p>
+      <div id="github-stats-issues-container" class="text-center p-2 rounded-lg">
+        <p id="github-stats-issues-count" class="text-xl font-bold">0</p>
+        <p class="text-tips text-xs">Issues</p>
       </div>
     </div>
 
     <div class="flex flex-wrap justify-evenly mb-4">
       <div class="repo-toggle-container">
-        <div id="personal-summary" class="cursor-pointer bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-md text-sm flex items-center">
+        <div id="github-stats-personal-summary" class="cursor-pointer rounded-md text-sm flex items-center">
           <div id="personal-label" class="pl-3 py-1">
             <span>Personal:</span>
           </div>
-          <div id="personal-public-toggle" class="personal-details cursor-pointer bg-blue-50 dark:bg-blue-800 text-blue-700 dark:text-blue-100 rounded-md px-3 py-1 text-sm inline-block hidden">
+          <div id="github-stats-personal-public-toggle" class="personal-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
             Public: <span id="personal-public-repos">0</span>
           </div>
           <div id="personal-repos-total" class="px-2">0</div>
-          <div id="personal-private-toggle" class="personal-details cursor-pointer bg-blue-50 dark:bg-blue-800 text-blue-700 dark:text-blue-100 rounded-md px-3 py-1 text-sm inline-block hidden">
+          <div id="github-stats-personal-private-toggle" class="personal-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
             Private: <span id="personal-private-repos">0</span>
           </div>
         </div>
       </div>
 
       <div class="repo-toggle-container">
-        <div id="collaborator-summary" class=" rounded-full inline-block">
-          <div id="collaborator-summary" class="cursor-pointer bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-md text-sm flex items-center">
+        <div id="github-stats-collaborator-summary" class=" rounded-full inline-block">
+          <div id="github-stats-collaborator-summary" class="cursor-pointer rounded-md text-sm flex items-center">
             <div id="collaborator-label" class="pl-3 py-1">
               <span id="collaborator-label">Collaborator:</span>
             </div>
-            <div id="collaborator-public-toggle" class="collaborator-details cursor-pointer bg-green-50 dark:bg-green-800 text-green-700 dark:text-green-100 rounded-md px-3 py-1 text-sm inline-block hidden">
+            <div id="github-stats-collaborator-public-toggle" class="collaborator-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
               Public: <span id="collaborator-public-repos">0</span>
             </div>
             <div id="collaborator-repos-total" class="px-2">0</div>
-            <div id="collaborator-private-toggle" class="collaborator-details cursor-pointer bg-green-50 dark:bg-green-800 text-green-700 dark:text-green-100 rounded-md px-3 py-1 text-sm inline-block hidden">
+            <div id="github-stats-collaborator-private-toggle" class="collaborator-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
               Private: <span id="collaborator-private-repos">0</span>
             </div>
           </div>
@@ -133,7 +136,7 @@ export function buildStatsContent(githubUsername: string): string {
       <a
         href="https://github.com/${githubUsername}"
         target="_blank"
-        class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+        class="text-link-interactive inline-flex items-center font-medium"
       >
         View on GitHub
         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -147,9 +150,9 @@ export function buildStatsContent(githubUsername: string): string {
 export function buildErrorContent(error: unknown) {
   return `
     <div class="text-center py-8">
-      <p class="text-red-600 dark:text-red-400">Failed to load GitHub statistics</p>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">The stats will be available when the API is accessible</p>
-      <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">Error: ${(error as Error).message}</p>
+      <p class="text-error">Failed to load GitHub statistics</p>
+      <p class="text-tips text-sm mt-2">The stats will be available when the API is accessible</p>
+      <p class="text-micro-tips text-xs mt-2">Error: ${(error as Error).message}</p>
     </div>
   `;
 }

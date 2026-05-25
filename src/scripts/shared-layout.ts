@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
       </svg>
     `;
-    button.className = 'absolute top-0 right-5 w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-white/50 dark:hover:bg-gray-800/50 shadow-lg transition duration-300 opacity-0 pointer-events-auto cursor-pointer active:cursor-grabbing';
+    button.className = 'post-return-btn absolute top-0 right-5 w-10 h-10 rounded-full flex items-center justify-center transition duration-300 opacity-0 pointer-events-auto cursor-pointer active:cursor-grabbing';
     let isDragging = false;
     let preventClick = false;
     let startX = 0, startY = 0;
