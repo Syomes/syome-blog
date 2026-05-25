@@ -113,18 +113,16 @@ export function buildStatsContent(githubUsername: string): string {
       </div>
 
       <div class="repo-toggle-container">
-        <div id="github-stats-collaborator-summary" class=" rounded-full inline-block">
-          <div id="github-stats-collaborator-summary" class="cursor-pointer rounded-md text-sm flex items-center">
-            <div id="collaborator-label" class="pl-3 py-1">
-              <span id="collaborator-label">Collaborator:</span>
-            </div>
-            <div id="github-stats-collaborator-public-toggle" class="collaborator-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
-              Public: <span id="collaborator-public-repos">0</span>
-            </div>
-            <div id="collaborator-repos-total" class="px-2">0</div>
-            <div id="github-stats-collaborator-private-toggle" class="collaborator-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
-              Private: <span id="collaborator-private-repos">0</span>
-            </div>
+        <div id="github-stats-collaborator-summary" class="cursor-pointer rounded-md text-sm flex items-center">
+          <div id="collaborator-label" class="pl-3 py-1">
+            <span>Collaborator:</span>
+          </div>
+          <div id="github-stats-collaborator-public-toggle" class="collaborator-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
+            Public: <span id="collaborator-public-repos">0</span>
+          </div>
+          <div id="collaborator-repos-total" class="px-2">0</div>
+          <div id="github-stats-collaborator-private-toggle" class="collaborator-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
+            Private: <span id="collaborator-private-repos">0</span>
           </div>
         </div>
       </div>
