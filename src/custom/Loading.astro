@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <div
@@ -9,21 +10,82 @@
   </div>
 </div>
 
+<script is:inline>
+  (function () {
+    if (typeof window !== "undefined" && !window.__ANIMATION_HIJACKED__) {
+      window.__ANIMATION_HIJACKED__ = true;
+      const OriginalObserver = window.IntersectionObserver;
+
+      window.IntersectionObserver = class extends OriginalObserver {
+        constructor(callback, options) {
+          const wrappedCallback = (entries, observer) => {
+            if (!document.body.classList.contains("is-loaded")) {
+              const handler = () => {
+                callback(entries, observer);
+              };
+              window.addEventListener("loading-finished", handler, {
+                once: true,
+              });
+            } else {
+              callback(entries, observer);
+            }
+          };
+          super(wrappedCallback, options);
+        }
+      };
+    }
+
+    const finishLoading = () => {
+      if (document.body.classList.contains("is-loaded")) return;
+
+      document.body.classList.add("is-loaded");
+      window.dispatchEvent(new CustomEvent("loading-finished"));
+
+      const loader = document.querySelector(".page-loader");
+      if (loader) {
+        loader.classList.add("hidden");
+      }
+
+      const content = document.querySelector(".page-content");
+      if (content) {
+        content.classList.add("fade-in");
+      }
+    };
+
+    setTimeout(finishLoading, 1000);
+  })();
+</script>
+
+<style is:global>
+  body:not(.is-loaded) *:not(.page-loader):not(.page-loader *) {
+    animation-play-state: paused !important;
+    transition: none !important;
+  }
+
+  .is-loaded .page-content,
+  .is-loaded .component-animate-rise,
+  .is-loaded .text-animate,
+  .is-loaded .divider-animate-scroll,
+  .is-loaded .staggered-card {
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
+  }
+</style>
+
 <style scoped>
   .loader-text {
     animation: pulse 1s infinite;
     animation-fill-mode: both;
   }
-  
+
   @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
 
-  0%,
-  100% {
-    opacity: 1;
+    50% {
+      opacity: 0.5;
+    }
   }
-
-  50% {
-    opacity: 0.5;
-  }
-}
 </style>

@@ -63,7 +63,6 @@ const serializedRepos = sortedRepos.map((repo) => ({
   <Footer />
 </Layout>
 
-<script src="../../scripts/shared-layout"></script>
 <script is:inline define:vars={{ serializedRepos }}>
   let pageLoaded = false;
 
@@ -314,9 +313,7 @@ const serializedRepos = sortedRepos.map((repo) => ({
             <li>
               <button 
                 class="w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                  currentCategory === ""
-                    ? "toggle-active"
-                    : "toggle-inactive"
+                  currentCategory === "" ? "toggle-active" : "toggle-inactive"
                 }"
                 data-category=""
               >

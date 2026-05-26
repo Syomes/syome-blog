@@ -7,9 +7,6 @@ function decodeHTML(html: string): string {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  const loader = document.querySelector(".page-loader");
-  const content = document.querySelector(".page-content");
-
   document.querySelectorAll("img[alt]").forEach((img) => {
     const image = img as HTMLImageElement;
     const figure = document.createElement("figure");
@@ -221,15 +218,4 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   addCodeHeader();
-
-  setTimeout(() => {
-    if (loader) {
-      loader.classList.add("hidden");
-    }
-    if (content) {
-      requestAnimationFrame(() => {
-        content.classList.add("fade-in");
-      });
-    }
-  }, 1000);
 });
