@@ -1,11 +1,10 @@
 ---
 import "../styles/page.css";
 import "../custom/theme.css";
-import MarkdownRenderer from "../components/MarkdownRenderer.astro";
 import Footer from "../components/Footer.astro";
 import siteConfig from "../custom/site-config";
 import Loading from "../custom/Loading.astro";
-const { title, repoUrl, languages, content } = Astro.props;
+const { title, repoUrl, languages } = Astro.props;
 ---
 
 <!doctype html>
@@ -106,15 +105,9 @@ const { title, repoUrl, languages, content } = Astro.props;
             }
           </header>
 
-          {
-            content ? (
-              <MarkdownRenderer content={content} maxWidth="wide" />
-            ) : (
-              <article class="prose prose-lg dark:prose-invert max-w-none">
-                <slot />
-              </article>
-            )
-          }
+          <article class="markdown-renderer-article prose prose-lg max-w-none">
+            <slot />
+          </article>
         </div>
       </main>
 
