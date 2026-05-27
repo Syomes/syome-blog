@@ -25,9 +25,9 @@ pre {
 }
 
 pre code, .prose pre code {
-  overflow-wrap: anywhere;
-  max-width: 100%;
   display: block;
+  width: fit-content;
+  min-width: 100%;
 }
 
 .prose code::before,
