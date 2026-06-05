@@ -76,7 +76,7 @@ const serializedPosts = sortedPosts.map((post) => ({
     const categoryFilterContainer = document.getElementById(
       "category-filter-container",
     );
-    const POSTS_PER_PAGE = 5;
+    const POSTS_PER_PAGE = 7;
 
     let sortedPosts = serializedPosts;
     let filteredPosts = [...serializedPosts];
@@ -180,7 +180,7 @@ const serializedPosts = sortedPosts.map((post) => ({
       }
 
       blogPostsContainer.innerHTML = `
-        <div class="grid grid-cols-1 gap-6 cards-container">
+        <div class="grid grid-cols-1 gap-3 cards-container">
           ${posts
             .map((post, index) => {
               const highlightedTitle = highlightText(post.title, searchQuery);
@@ -191,8 +191,8 @@ const serializedPosts = sortedPosts.map((post) => ({
 
               return `
               <article class="card-container rounded-2xl overflow-hidden transition-all duration-300 staggered-card transform hover:-translate-y-1" data-index="${index}">
-                <div class="p-6">
-                  <div class="text-tips flex items-center text-sm mb-3 justify-between">
+                <div class="p-3">
+                  <div class="text-tips flex items-center text-sm mb-1 justify-between">
                     <time datetime="${post.pubDate}">
                       ${new Date(post.pubDate).toLocaleDateString("en-US", {
                         year: "numeric",
@@ -210,10 +210,10 @@ const serializedPosts = sortedPosts.map((post) => ({
                         : ""
                     }
                   </div>
-                  <h2 class="text-main text-2xl font-semibold mb-3">
+                  <h2 class="text-main text-xl font-semibold mb-1">
                     <a href="/posts/${post.slug}" class="hover:underline">${highlightedTitle}</a>
                   </h2>
-                  <p class="text-tips mb-4">
+                  <p class="text-tips mb-2">
                     ${highlightedDescription}
                   </p>
                   <div class="flex flex-wrap gap-2">
