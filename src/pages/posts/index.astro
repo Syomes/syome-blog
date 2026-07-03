@@ -162,7 +162,7 @@ const serializedPosts = sortedPosts.map((post) => ({
       cards.forEach((card, index) => {
         setTimeout(() => {
           card.classList.add("card-ready");
-        }, index * 150);
+        }, index * 50);
       });
     }
 
@@ -293,12 +293,6 @@ const serializedPosts = sortedPosts.map((post) => ({
               const page = parseInt(target.dataset.page || "1");
               if (page) {
                 loadPage(page);
-                const container = document.querySelector(
-                  "#blog-posts-container",
-                );
-                if (container) {
-                  container.scrollIntoView({ behavior: "smooth" });
-                }
               }
             }
           });

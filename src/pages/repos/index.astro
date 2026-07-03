@@ -158,7 +158,7 @@ const serializedRepos = sortedRepos.map((repo) => ({
       cards.forEach((card, index) => {
         setTimeout(() => {
           card.classList.add("card-ready");
-        }, index * 150);
+        }, index * 50);
       });
     }
 
@@ -282,10 +282,6 @@ const serializedRepos = sortedRepos.map((repo) => ({
               const page = parseInt(target.dataset.page || "1");
               if (page) {
                 loadPage(page);
-                const container = document.querySelector("#repos-container");
-                if (container) {
-                  container.scrollIntoView({ behavior: "smooth" });
-                }
               }
             }
           });
@@ -313,9 +309,7 @@ const serializedRepos = sortedRepos.map((repo) => ({
             <li>
               <button 
                 class="w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                  currentCategory === ""
-                    ? "toggle-active"
-                    : "toggle-inactive"
+                  currentCategory === "" ? "toggle-active" : "toggle-inactive"
                 }"
                 data-category=""
               >
