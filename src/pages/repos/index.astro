@@ -155,9 +155,21 @@ const serializedRepos = sortedRepos.map((repo) => ({
 
     function applyCardAnimations() {
       const cards = document.querySelectorAll(".staggered-card");
-      cards.forEach((card, index) => {
+      if (cards.length === 0) return;
+
+      const viewportCenter = window.innerHeight / 2;
+
+      const cardEntries = Array.from(cards).map((card) => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.top + rect.height / 2;
+        return { card, dist: Math.abs(cardCenter - viewportCenter) };
+      });
+
+      cardEntries.sort((a, b) => a.dist - b.dist);
+
+      cardEntries.forEach((entry, index) => {
         setTimeout(() => {
-          card.classList.add("card-ready");
+          entry.card.classList.add("card-ready");
         }, index * 50);
       });
     }
