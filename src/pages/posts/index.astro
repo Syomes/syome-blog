@@ -202,49 +202,51 @@ const serializedPosts = sortedPosts.map((post) => ({
               );
 
               return `
-              <article class="card-container rounded-2xl overflow-hidden transition-all duration-300 staggered-card transform hover:-translate-y-1" data-index="${index}">
-                <div class="p-3">
-                  <div class="text-tips flex items-center text-sm mb-1 justify-between">
-                    <time datetime="${post.pubDate}">
-                      ${new Date(post.pubDate).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </time>
-                    ${
-                      post.category
-                        ? `
-                      <span class="post-category ml-3 px-2 py-1 text-xs font-medium rounded">
-                        ${post.category}
-                      </span>
-                    `
-                        : ""
-                    }
+              <div class="group">
+                <article class="card-container rounded-2xl overflow-hidden transition-all duration-300 staggered-card transform group-hover:-translate-y-1" data-index="${index}">
+                  <div class="p-3">
+                    <div class="text-tips flex items-center text-sm mb-1 justify-between">
+                      <time datetime="${post.pubDate}">
+                        ${new Date(post.pubDate).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </time>
+                      ${
+                        post.category
+                          ? `
+                        <span class="post-category ml-3 px-2 py-1 text-xs font-medium rounded">
+                          ${post.category}
+                        </span>
+                      `
+                          : ""
+                      }
+                    </div>
+                    <h2 class="text-main text-xl font-semibold mb-1">
+                      <a href="/posts/${post.slug}" class="hover:underline">${highlightedTitle}</a>
+                    </h2>
+                    <p class="text-tips mb-2">
+                      ${highlightedDescription}
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                      ${
+                        post.tags
+                          ?.map((tag) => {
+                            const highlightedTag = highlightText(
+                              tag,
+                              searchQuery,
+                            );
+                            return `
+                          <span class="toggle-active px-2 py-1 text-xs font-medium rounded">${highlightedTag}</span>
+                        `;
+                          })
+                          .join("") || ""
+                      }
+                    </div>
                   </div>
-                  <h2 class="text-main text-xl font-semibold mb-1">
-                    <a href="/posts/${post.slug}" class="hover:underline">${highlightedTitle}</a>
-                  </h2>
-                  <p class="text-tips mb-2">
-                    ${highlightedDescription}
-                  </p>
-                  <div class="flex flex-wrap gap-2">
-                    ${
-                      post.tags
-                        ?.map((tag) => {
-                          const highlightedTag = highlightText(
-                            tag,
-                            searchQuery,
-                          );
-                          return `
-                        <span class="toggle-active px-2 py-1 text-xs font-medium rounded">${highlightedTag}</span>
-                      `;
-                        })
-                        .join("") || ""
-                    }
-                  </div>
-                </div>
-              </article>
+                </article>
+              </div>
             `;
             })
             .join("")}

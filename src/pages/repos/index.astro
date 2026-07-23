@@ -198,42 +198,44 @@ const serializedRepos = sortedRepos.map((repo) => ({
               );
 
               return `
-              <article class="card-container rounded-2xl overflow-hidden transition-all duration-300 staggered-card transform hover:-translate-y-1" data-index="${index}">
-                <div class="p-3">
-                  <div class="flex items-center justify-between mb-1">
-                    <h2 class="text-main text-xl font-semibold">
-                      <a href="/repos/${repo.slug}" class="hover:underline">${highlightedTitle}</a>
-                    </h2>
-                    ${
-                      repo.category
-                        ? `
-                      <span class="post-category ml-3 px-2 py-1 text-xs font-medium rounded">
-                        ${repo.category}
-                      </span>
-                    `
-                        : ""
-                    }
+              <div class="group">
+                <article class="card-container rounded-2xl overflow-hidden transition-all duration-300 staggered-card transform group-hover:-translate-y-1" data-index="${index}">
+                  <div class="p-3">
+                    <div class="flex items-center justify-between mb-1">
+                      <h2 class="text-main text-xl font-semibold">
+                        <a href="/repos/${repo.slug}" class="hover:underline">${highlightedTitle}</a>
+                      </h2>
+                      ${
+                        repo.category
+                          ? `
+                        <span class="post-category ml-3 px-2 py-1 text-xs font-medium rounded">
+                          ${repo.category}
+                        </span>
+                      `
+                          : ""
+                      }
+                    </div>
+                    <p class="text-tips mb-2">
+                      ${highlightedDescription}
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                      ${
+                        repo.tags
+                          ?.map((tag) => {
+                            const highlightedTag = highlightText(
+                              tag,
+                              searchQuery,
+                            );
+                            return `
+                          <span class="toggle-active px-2 py-1 text-xs font-medium rounded">${highlightedTag}</span>
+                        `;
+                          })
+                          .join("") || ""
+                      }
+                    </div>
                   </div>
-                  <p class="text-tips mb-2">
-                    ${highlightedDescription}
-                  </p>
-                  <div class="flex flex-wrap gap-2">
-                    ${
-                      repo.tags
-                        ?.map((tag) => {
-                          const highlightedTag = highlightText(
-                            tag,
-                            searchQuery,
-                          );
-                          return `
-                        <span class="toggle-active px-2 py-1 text-xs font-medium rounded">${highlightedTag}</span>
-                      `;
-                        })
-                        .join("") || ""
-                    }
-                  </div>
-                </div>
-              </article>
+                </article>
+              </div>
             `;
             })
             .join("")}
