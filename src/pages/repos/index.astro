@@ -291,7 +291,7 @@ const serializedRepos = sortedRepos.map((repo) => ({
         .querySelectorAll("#pagination-container button")
         .forEach((button) => {
           button.addEventListener("click", (e) => {
-            const target = e.target;
+            const target = e.currentTarget;
             if (target) {
               const page = parseInt(target.dataset.page || "1");
               if (page) {
@@ -358,7 +358,7 @@ const serializedRepos = sortedRepos.map((repo) => ({
         .querySelectorAll("button[data-category]")
         .forEach((button) => {
           button.addEventListener("click", (e) => {
-            const target = e.target;
+            const target = e.currentTarget;
             if (target) {
               currentCategory = target.dataset.category || "";
               filterRepos();

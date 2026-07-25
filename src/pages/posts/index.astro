@@ -302,7 +302,7 @@ const serializedPosts = sortedPosts.map((post) => ({
         .querySelectorAll("#pagination-container button")
         .forEach((button) => {
           button.addEventListener("click", (e) => {
-            const target = e.target;
+            const target = e.currentTarget;
             if (target) {
               const page = parseInt(target.dataset.page || "1");
               if (page) {
@@ -369,7 +369,7 @@ const serializedPosts = sortedPosts.map((post) => ({
         .querySelectorAll("button[data-category]")
         .forEach((button) => {
           button.addEventListener("click", (e) => {
-            const target = e.target;
+            const target = e.currentTarget;
             if (target) {
               currentCategory = target.dataset.category || "";
               filterPosts();
