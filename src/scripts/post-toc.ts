@@ -6,7 +6,7 @@ export class Toc {
   private title: HTMLElement | null = null;
 
   private threshold: number = 0;
-  private finalWidth: number = 224;
+  private finalWidth: number = 240;
   private wide: boolean = false;
   private open: boolean = false;
   private bridging: boolean = false;
@@ -21,7 +21,7 @@ export class Toc {
 
     if (!this.wrapper || !this.panel || !this.toggle || !this.nav || !this.title) return;
 
-    this.threshold = 224;
+    this.threshold = 240;
 
     const clone = this.nav.cloneNode(true) as HTMLElement;
     clone.style.position = 'fixed';
