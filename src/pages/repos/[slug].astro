@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import RepoLayout from "../../layouts/RepoLayout.astro";
+import PostLayout from "../../layouts/PostLayout.astro";
 
 export async function getStaticPaths() {
   const projectEntries = await getCollection("repos");
@@ -11,13 +11,15 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
 ---
 
-<RepoLayout
+<PostLayout
+  type="repo"
   title={entry.data.title}
   repoUrl={entry.data.repoUrl}
   languages={entry.data.languages}
+  headings={headings}
 >
   <Content />
-</RepoLayout>
+</PostLayout>

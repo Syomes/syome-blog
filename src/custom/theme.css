@@ -20,7 +20,10 @@
   @apply text-main bg-yellow-200 dark:bg-yellow-800
 }
 .card-container {
-  @apply rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg
+  @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg
+}
+.card-container-interactive {
+  @apply bg-gray-800 hover:bg-gray-700 transition-colors
 }
 .border-container {
   @apply border-gray-200 dark:border-gray-700
@@ -38,6 +41,15 @@
   @apply text-white dark:text-gray-100 prose-pre:bg-gray-800 prose-blockquote:border-l-blue-500 prose-blockquote:dark:border-l-blue-400 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline dark:prose-invert
 }
 
+.toc-toggle {
+  @apply bg-gray-900 hover:bg-gray-700 transition-colors
+}
+.toc-container {
+  @apply bg-gray-900
+}
+.toc-read {
+  @apply text-gray-500 transition-colors
+}
 
 .github-stats-total-container {
   @apply bg-gray-50 dark:bg-gray-600
@@ -157,9 +169,6 @@
 }
 .post-description {
   @apply text-gray-600 dark:text-gray-300
-}
-.repo-url {
-  @apply bg-gray-800 text-white hover:bg-gray-700 transition-colors
 }
 .repo-lang {
   @apply bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300

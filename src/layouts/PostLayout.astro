@@ -4,7 +4,19 @@ import "../custom/theme.css";
 import Footer from "../components/Footer.astro";
 import siteConfig from "../custom/site-config";
 import Loading from "../custom/Loading.astro";
-const { title, description, pubDate } = Astro.props;
+const { type, title, description, pubDate, repoUrl, languages, headings } =
+  Astro.props;
+
+const tocHeadings = headings?.length
+  ? (() => {
+      const minDepth = Math.min(...headings.map((h: any) => h.depth));
+      return headings.map((h: any) => ({
+        slug: h.slug,
+        text: h.text,
+        depth: h.depth - minDepth + 1,
+      }));
+    })()
+  : [];
 ---
 
 <!doctype html>
@@ -16,12 +28,11 @@ const { title, description, pubDate } = Astro.props;
     <meta name="generator" content={Astro.generator} />
   </head><div class="fixed inset-0 z-[-1]"></div>
 
-  <title>{title}</title>
-  <meta name="description" content={description} />
+  <title>{siteConfig.siteName} - {title}</title>
+  {type === "post" && <meta name="description" content={description} />}
 
   <body class="h-full">
     <Loading />
-
     <iframe
       src="/background"
       class="fixed inset-0 z-[-1] w-full h-full border-none pointer-events-none"
@@ -50,15 +61,71 @@ const { title, description, pubDate } = Astro.props;
                 d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
                 clip-rule="evenodd"></path>
             </svg>
-            Back to Posts
+            Back to {(type === "repo" && "Repos") || "Posts"}
           </a>
         </div>
       </header>
 
-      <main class="flex-1 relative z-10 page-content">
+      <main class="relative z-10 flex">
+        <div id="toc-wrapper" class="flex-1">
+          {
+            tocHeadings.length > 0 && (
+              <div id="toc-panel" class="sticky top-20 w-fit ml-auto">
+                <button
+                  id="toc-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  class="toc-toggle flex items-center gap-2 rounded-lg p-2 text-sm w-full"
+                >
+                  <svg
+                    id="toc-toggle-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 min-w-5 text-tips"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                    />
+                  </svg>
+                  <span
+                    id="toc-toggle-title"
+                    class="text-main font-medium whitespace-nowrap hidden"
+                  >
+                    Table of Contents
+                  </span>
+                </button>
+                <nav id="toc-nav" class="grid grid-rows-[0fr] overflow-hidden">
+                  <div class="min-h-0 overflow-hidden">
+                    <div class="toc-container rounded-lg mt-1 p-3 max-h-[min(65vh,540px)] overflow-y-auto overflow-x-hidden">
+                      <ul class="space-y-1">
+                        {tocHeadings.map((h: any) => (
+                          <li
+                            style={`padding-left: ${(h.depth - 1) * 0.75}rem`}
+                          >
+                            <a
+                              href={`#${h.slug}`}
+                              class="text-tips-interactive hover:text-link-interactive block py-0.5 text-sm leading-snug truncate"
+                            >
+                              {h.text}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </nav>
+              </div>
+            )
+          }
+        </div>
         <div
           id="content-container"
-          class="max-w-4xl mx-auto px-4 py-8 relative"
+          class="page-content max-w-4xl px-4 py-8 relative min-w-0"
         >
           <header class="mb-10 text-center">
             {
@@ -73,7 +140,7 @@ const { title, description, pubDate } = Astro.props;
               )
             }
             <h1
-              class="text-main text-4xl md:text-5xl font-bold mb-4 break-words"
+              class="post-title text-main text-4xl md:text-5xl font-bold mb-4 break-words"
               style="line-height: 1.3;"
             >
               {title}
@@ -85,12 +152,50 @@ const { title, description, pubDate } = Astro.props;
                 </p>
               )
             }
+            {
+              repoUrl && (
+                <div class="flex flex-wrap justify-center gap-4 mb-6">
+                  <a
+                    href={repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="card-container-interactive inline-flex items-center px-4 py-2 text-main text-sm font-medium rounded-md"
+                  >
+                    <svg
+                      class="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+                      />
+                    </svg>
+                    View on GitHub
+                  </a>
+                </div>
+              )
+            }
+            {
+              languages && languages.length > 0 && (
+                <div class="flex flex-wrap justify-center gap-2">
+                  {languages.map((lang: string) => (
+                    <span class="repo-lang px-3 py-1 text-sm font-medium rounded-full">
+                      {lang}
+                    </span>
+                  ))}
+                </div>
+              )
+            }
           </header>
 
           <article class="markdown-renderer-article prose prose-lg max-w-none">
             <slot />
           </article>
         </div>
+
+        <div class="flex-1"></div>
       </main>
 
       <div
@@ -103,7 +208,98 @@ const { title, description, pubDate } = Astro.props;
       <Footer />
     </div>
 
-    <script src="/src/scripts/shared-layout"></script>
+    <script src="/src/scripts/post-layout"></script>
   </body>
+
+  <style>
+    @media (max-width: 720px) {
+      .post-title {
+        @apply text-3xl;
+      }
+      .post-description {
+        @apply text-lg;
+      }
+      .markdown-renderer-article {
+        @apply leading-normal;
+
+        h1 {
+          @apply text-3xl my-5;
+        }
+
+        h2 {
+          @apply text-2xl my-5;
+        }
+
+        h3,
+        h4,
+        h5,
+        h6 {
+          @apply text-xl my-5;
+        }
+
+        p {
+          @apply my-5;
+        }
+
+        blockquote {
+          @apply my-5;
+        }
+      }
+    }
+  </style>
+
+  <style is:global>
+    #toc-nav {
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow: hidden;
+    }
+    #toc-panel.toc-open #toc-nav {
+      grid-template-rows: 1fr;
+    }
+
+    #toc-toggle-title {
+      opacity: 0;
+    }
+    #toc-panel.toc-open #toc-toggle-title {
+      opacity: 1;
+    }
+
+    #toc-panel,
+    #toc-nav,
+    #toc-toggle-title {
+      transition: none;
+    }
+    #toc-panel.toc-anim {
+      transition: max-width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #toc-panel.toc-anim #toc-nav {
+      transition:
+        grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        max-width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #toc-panel.toc-anim #toc-toggle-title {
+      transition: opacity 0.2s ease 0.1s;
+    }
+
+    #toc-panel {
+      width: fit-content;
+      max-width: 2.5rem;
+    }
+    #toc-panel.toc-open {
+      max-width: 14rem;
+    }
+    #toc-nav {
+      width: fit-content;
+      max-width: 0;
+    }
+    #toc-panel.toc-open #toc-nav {
+      max-width: 14rem;
+    }
+    #toc-toggle {
+      overflow: hidden;
+    }
+  </style>
+
 
 </html>
