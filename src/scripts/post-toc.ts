@@ -117,10 +117,13 @@ export class Toc {
         entries.forEach((entry) => {
           const link = links.get(entry.target.id);
           if (!link) return;
-          link.classList.toggle('toc-read', !entry.isIntersecting);
+          link.classList.toggle(
+            'toc-read',
+            !entry.isIntersecting && entry.boundingClientRect.top <= HEADER_OFFSET
+          );
         });
       },
-      { rootMargin: `-${HEADER_OFFSET}px 0px 9999px 0px`, threshold: 0 }
+      { rootMargin: `-${HEADER_OFFSET}px 0px 0px 0px`, threshold: 0 }
     );
     headingEls.forEach((h) => observer.observe(h));
   }
