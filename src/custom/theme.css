@@ -42,10 +42,10 @@
 }
 
 .toc-toggle {
-  @apply bg-gray-900 hover:bg-gray-700 transition-colors
+  @apply bg-gray-700 hover:bg-gray-600 transition-colors
 }
 .toc-container {
-  @apply bg-gray-900
+  @apply bg-gray-700
 }
 .toc-read {
   @apply text-gray-500 transition-colors
