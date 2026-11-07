@@ -1,92 +1,52 @@
 ---
 import "../custom/theme.css";
 import { getCollection } from "astro:content";
+import type { Post } from "../content/config";
 
 const posts = await getCollection("posts");
-const pinnedPosts = posts.filter((post) => post.data.pin);
-if (pinnedPosts.length > 1) {
+const byDate = (a: {data: Post}, b: {data: Post}) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+const pinnedPosts = posts.filter((post) => post.data.pin).sort(byDate);
+if (pinnedPosts.length > 2) {
   console.warn(
     "\x1b[33m%s\x1b[0m",
-    `[WARNING]: ${pinnedPosts.length} posts are pinned. Only the first one will be featured.`,
+    `[WARNING]: ${pinnedPosts.length} posts are pinned. Only the first two will be featured.`,
   );
   console.warn(
     "\x1b[33m%s\x1b[0m",
     `Pinned posts: ${pinnedPosts.map((p) => p.data.title).join(", ")}`,
   );
 }
-const sortedPosts =
-  pinnedPosts.length > 0
-    ? pinnedPosts
-    : posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-const latestPost = sortedPosts[0];
-
-const repos = await getCollection("repos");
-const pinnedRepos = repos.filter((repo) => repo.data.pin);
-if (pinnedRepos.length > 1) {
-  console.warn(
-    "\x1b[33m%s\x1b[0m",
-    `[WARNING]: ${pinnedRepos.length} repos are pinned. Only the first one will be featured.`,
-  );
-  console.warn(
-    "\x1b[33m%s\x1b[0m",
-    `Pinned repos: ${pinnedRepos.map((r) => r.data.title).join(", ")}`,
-  );
-}
-const sortedRepos =
-  pinnedRepos.length > 0
-    ? pinnedRepos
-    : repos.sort((a, b) => b.slug.localeCompare(a.slug));
-const latestRepo = sortedRepos.length > 0 ? sortedRepos[0] : null;
+const restPosts = posts.filter((post) => !post.data.pin).sort(byDate);
+const featuredPosts = [...pinnedPosts, ...restPosts].slice(0, 2);
 ---
 
 <section class="mt-16 mb-16">
   <h2 class="text-main text-2xl font-bold mb-6">Recommended Reading</h2>
 
   {
-    !latestPost && !latestRepo ? (
+    featuredPosts.length === 0 ? (
       <div class="border-container text-tips border rounded-lg p-6 text-center">
-        <h3 class="text-main text-xl font-semibold mb-2">
-          No content yet
-        </h3>
+        <h3 class="text-main text-xl font-semibold mb-2">No content yet</h3>
         <p class="text-tips">
-          Check back later for recommended posts and projects.
+          Check back later for recommended posts.
         </p>
       </div>
     ) : (
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {latestPost && (
-          <article class="border-container border rounded-lg p-6">
+        {featuredPosts.map((post) => (
+          <article class="border-container border rounded-lg p-6 flex flex-col">
             <h3 class="text-main text-xl font-semibold mb-2">
-              {latestPost.data.title}
+              {post.data.title}
             </h3>
-            <p class="text-tips mb-4">
-              {latestPost.data.description}
-            </p>
+            <p class="text-tips mb-4">{post.data.description}</p>
             <a
-              href={`/posts/${latestPost.slug}`}
-              class="text-link-interactive font-medium"
+              href={`/posts/${post.slug}`}
+              class="text-link-interactive font-medium mt-auto"
             >
               Read more →
             </a>
           </article>
-        )}
-
-        {latestRepo && (
-          <article class="border-container border rounded-lg p-6">
-            <h3 class="text-main text-xl font-semibold mb-2">
-              {latestRepo.data.title}
-            </h3>
-            <p class="text-tips mb-4">
-              {latestRepo.data.description}
-            </p>
-            <a
-              href={`/repos/${latestRepo.slug}`}
-              class="text-link-interactive font-medium"
-            >
-              Learn more →
-            </a>
-          </article>
-        )}
+        ))}
       </div>
     )
   }
