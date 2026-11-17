@@ -4,7 +4,7 @@ import "../custom/theme.css";
 import Footer from "../components/Footer.astro";
 import siteConfig from "../custom/site-config";
 import Loading from "../custom/Loading.astro";
-const { type, title, description, pubDate, headings } =
+const { type, title, description, headings } =
   Astro.props;
 
 const tocHeadings = headings?.length
@@ -39,7 +39,7 @@ const tocHeadings = headings?.length
       title="background"></iframe>
 
     <div class="min-h-screen flex flex-col">
-      <header class="navbar-container site-header sticky top-0 z-30">
+      <header class="navbar-container site-header border-b sticky top-0 z-30">
         <div
           class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between"
         >
