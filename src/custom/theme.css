@@ -164,9 +164,6 @@
 }
 
 
-.post-pub-date {
-  @apply text-blue-600 bg-blue-100 rounded-full dark:text-blue-300 dark:bg-blue-900/50
-}
 .post-description {
   @apply text-gray-600 dark:text-gray-300
 }

@@ -128,17 +128,6 @@ const tocHeadings = headings?.length
           class="page-content max-w-4xl px-4 py-8 relative min-w-0"
         >
           <header class="mb-10 text-center">
-            {
-              pubDate && (
-                <time class="post-pub-date inline-block px-3 py-1 text-sm font-medium mb-4">
-                  {new Date(pubDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
-              )
-            }
             <h1
               class="post-title text-main text-4xl md:text-5xl font-bold mb-4 break-words"
               style="line-height: 1.3;"
