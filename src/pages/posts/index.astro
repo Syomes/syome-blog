@@ -238,7 +238,7 @@ const serializedPosts = sortedPosts.map((post) => ({
                               searchQuery,
                             );
                             return `
-                          <span class="toggle-active px-2 py-1 text-xs font-medium rounded">${highlightedTag}</span>
+                          <span class="px-2 py-1 text-xs font-medium rounded post-tag">${highlightedTag}</span>
                         `;
                           })
                           .join("") || ""

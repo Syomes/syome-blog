@@ -164,14 +164,11 @@
 }
 
 
-.post-description {
-  @apply text-gray-600 dark:text-gray-300
-}
-.repo-lang {
-  @apply bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300
-}
 .post-category {
   @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300
+}
+.post-tag {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
 }
 .post-return-btn {
   @apply bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 shadow-lg
