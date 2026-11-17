@@ -95,6 +95,7 @@ function initAnimations(githubStats: GitHubStats) {
   animateNumber(document.getElementById('github-stats-issues-count'), githubStats.issues.overall || 0, 0);
 
   animateNumber(document.getElementById('personal-repos-total'), githubStats.repositories.personal.total || 0, 0);
+  animateNumber(document.getElementById('external-repos-total'), githubStats.pullRequests.external.total || 0, 0);
   animateNumber(document.getElementById('collaborator-repos-total'), githubStats.repositories.collaborator.total || 0, 0);
 
   animateNumber(document.getElementById('personal-public-repos'), githubStats.repositories.personal.public || 0, 0);
@@ -151,12 +152,11 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   }
 
   const languageSectionElement = document.getElementById('language-stats-section');
+  const wasLanguageHidden = languageSectionElement?.classList.contains('hidden') ?? false;
 
   if (filter.category === 'external') {
     if (languageSectionElement) languageSectionElement.classList.add('hidden');
   } else {
-    if (languageSectionElement) languageSectionElement.classList.remove('hidden');
-
     if (filter.category === 'overall') {
       fullLanguageList = githubStats.languages.overall || [];
     } else {
@@ -172,17 +172,19 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
     const toggleContainer = document.getElementById('language-toggle-container');
 
     if (langList && toggleContainer) {
-      if (langListAutoAnimateController) {
+      if (wasLanguageHidden && langListAutoAnimateController) {
         langListAutoAnimateController.disable();
       }
 
       updateLanguageDisplay(langList, fullLanguageList);
       updateLanguageToggle(toggleContainer, langList, fullLanguageList);
+    }
 
+    if (languageSectionElement) languageSectionElement.classList.remove('hidden');
+
+    if (wasLanguageHidden && langListAutoAnimateController) {
       requestAnimationFrame(() => {
-        if (langListAutoAnimateController) {
-          langListAutoAnimateController.enable();
-        }
+        langListAutoAnimateController?.enable();
       });
     }
   }
