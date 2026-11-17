@@ -14,11 +14,13 @@ export interface GitHubStats {
   pullRequests: {
     personal: CategoryBreakdown<number>;
     collaborator: CategoryBreakdown<number>;
+    external: CategoryBreakdown<number>;
     overall: number;
   };
   issues: {
     personal: CategoryBreakdown<number>;
     collaborator: CategoryBreakdown<number>;
+    external: CategoryBreakdown<number>;
     overall: number;
   };
 

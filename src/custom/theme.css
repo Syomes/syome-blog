@@ -51,97 +51,62 @@
   @apply text-gray-500 transition-colors
 }
 
-.github-stats-total-container {
-  @apply bg-gray-50 dark:bg-gray-600
-}
-#github-stats-loading-icon {
-  @apply border-indigo-600 dark:border-indigo-400
-}
-#github-stats-progress-bar-container {
-  @apply bg-gray-200 dark:bg-gray-600
-}
-#github-stats-progress-bar {
-  @apply bg-indigo-600 dark:bg-indigo-500
-}
-#github-stats-personal-summary {
-  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 transition-colors duration-300 ease-in-out;
-}
-#github-stats-personal-summary:hover:not(:has(#github-stats-personal-public-toggle:hover, #github-stats-personal-private-toggle:hover)) {
-  @apply bg-blue-200 dark:bg-blue-800;
-}
-#github-stats-personal-summary.active-filter {
-  @apply bg-blue-600 text-white dark:bg-blue-800;
-}
-#github-stats-personal-summary.active-filter:hover:not(:has(#github-stats-personal-public-toggle:hover, #github-stats-personal-private-toggle:hover)) {
-  @apply bg-blue-700 dark:bg-blue-900;
-}
-#github-stats-personal-public-toggle,
-#github-stats-personal-private-toggle {
-  @apply bg-blue-50 text-blue-700 dark:bg-blue-800 dark:text-blue-100 transition-colors duration-300 ease-in-out;
-}
-#github-stats-personal-public-toggle:hover,
-#github-stats-personal-private-toggle:hover {
-  @apply bg-blue-100 dark:bg-blue-700;
-}
-#github-stats-personal-public-toggle.active-filter,
-#github-stats-personal-private-toggle.active-filter {
-  @apply bg-blue-400 text-white dark:bg-blue-600;
-}
-#github-stats-personal-public-toggle.active-filter:hover,
-#github-stats-personal-private-toggle.active-filter:hover {
-  @apply bg-blue-500 dark:bg-blue-700;
-}
+/* init, no active filter */
+#github-stats-personal-summary,
+#github-stats-external-summary,
 #github-stats-collaborator-summary {
-  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 transition-colors duration-300 ease-in-out;
+  @apply bg-gray-700 text-gray-200;
 }
-#github-stats-collaborator-summary:hover:not(:has(#github-stats-collaborator-public-toggle:hover, #github-stats-collaborator-private-toggle:hover)) {
-  @apply bg-green-200 dark:bg-green-800;
+#github-stats-personal-summary:hover:not(:has(.toggle:hover, #github-stats-personal-public-toggle:hover, #github-stats-personal-private-toggle:hover)),
+#github-stats-external-summary:hover,
+#github-stats-collaborator-summary:hover:not(:has(.toggle:hover, #github-stats-collaborator-public-toggle:hover, #github-stats-collaborator-private-toggle:hover)) {
+  @apply bg-gray-600;
 }
-#github-stats-collaborator-summary.active-filter {
-  @apply bg-emerald-600 text-white dark:bg-emerald-800;
+
+/* non-active while there is an active filter */
+#github-stats-container:has(.active-filter) #github-stats-personal-summary:not(.active-filter),
+#github-stats-container:has(.active-filter) #github-stats-external-summary:not(.active-filter),
+#github-stats-container:has(.active-filter) #github-stats-collaborator-summary:not(.active-filter) {
+  @apply bg-gray-800 text-gray-500;
 }
-#github-stats-collaborator-summary.active-filter:hover:not(:has(#github-stats-collaborator-public-toggle:hover, #github-stats-collaborator-private-toggle:hover)) {
-  @apply bg-emerald-700 dark:bg-emerald-900;
+#github-stats-container:has(.active-filter) #github-stats-personal-summary:not(.active-filter):hover,
+#github-stats-container:has(.active-filter) #github-stats-external-summary:not(.active-filter):hover,
+#github-stats-container:has(.active-filter) #github-stats-collaborator-summary:not(.active-filter):hover {
+  @apply bg-gray-700 text-gray-400;
 }
-#github-stats-collaborator-public-toggle,
-#github-stats-collaborator-private-toggle {
-  @apply bg-green-50 text-green-700 dark:bg-green-800 dark:text-green-100 transition-colors duration-300 ease-in-out;
+
+/* summary while one in summary active */
+#github-stats-personal-summary.active-filter:has(> .active-filter):not(:has(> .active-filter ~ .active-filter)),
+#github-stats-collaborator-summary.active-filter:has(> .active-filter):not(:has(> .active-filter ~ .active-filter)) {
+  @apply bg-gray-800 text-gray-500;
 }
-#github-stats-collaborator-public-toggle:hover,
-#github-stats-collaborator-private-toggle:hover {
-  @apply bg-green-100 dark:bg-green-700;
+
+/* summary while active */
+#github-stats-personal-summary.active-filter:has(> .active-filter ~ .active-filter),
+#github-stats-collaborator-summary.active-filter:has(> .active-filter ~ .active-filter) {
+  @apply bg-gray-600 text-gray-100;
 }
+
+/* the one in summary active */
+#github-stats-personal-public-toggle.active-filter,
+#github-stats-personal-private-toggle.active-filter,
 #github-stats-collaborator-public-toggle.active-filter,
 #github-stats-collaborator-private-toggle.active-filter {
-  @apply bg-emerald-400 text-white dark:bg-emerald-600;
+  @apply text-white bg-gray-600;
 }
+#github-stats-personal-public-toggle.active-filter:hover,
+#github-stats-personal-private-toggle.active-filter:hover,
 #github-stats-collaborator-public-toggle.active-filter:hover,
 #github-stats-collaborator-private-toggle.active-filter:hover {
-  @apply bg-emerald-500 dark:bg-emerald-700;
+  @apply bg-gray-500;
 }
-#github-stats-contributions-count {
-  @apply text-indigo-600 dark:text-indigo-400
-}
-#github-stats-repositories-count {
-  @apply text-green-600 dark:text-green-400
-}
-#github-stats-stars-container {
-  @apply bg-blue-50 dark:bg-blue-900
-}
-#github-stats-stars-count {
-  @apply text-blue-600 dark:text-blue-300
-}
-#github-stats-prs-container {
-  @apply bg-purple-50 dark:bg-purple-900
-}
-#github-stats-prs-count {
-  @apply text-purple-600 dark:text-purple-300
-}
-#github-stats-issues-container {
-  @apply bg-yellow-50 dark:bg-yellow-900
-}
-#github-stats-issues-count {
-  @apply text-yellow-600 dark:text-yellow-300
+
+/* inactive one while other in this summary is active */
+#github-stats-personal-public-toggle:not(.active-filter):hover,
+#github-stats-personal-private-toggle:not(.active-filter):hover,
+#github-stats-collaborator-public-toggle:not(.active-filter):hover,
+#github-stats-collaborator-private-toggle:not(.active-filter):hover {
+  @apply bg-gray-600 text-gray-400;
 }
 
 

@@ -73,26 +73,26 @@ export function buildStatsContent(githubUsername: string): string {
     <div class="grid grid-cols-2 gap-4 mb-4">
       <div class="github-stats-total-container text-center p-3 rounded-lg">
         <p id="github-stats-contributions-count" class="text-2xl font-bold">0</p>
-        <p class="text-tips text-sm">Contributions</p>
+        <p class="text-main text-sm">Contributions</p>
       </div>
       <div class="github-stats-total-container text-center p-3 rounded-lg">
         <p id="github-stats-repositories-count" class="text-2xl font-bold">0</p>
-        <p class="text-tips text-sm">Total Repositories</p>
+        <p class="text-main text-sm">Total Repositories</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-4 mb-4">
+    <div class="grid grid-cols-3 gap-4 mb-4" id="github-stats-top-grid">
       <div id="github-stats-stars-container" class="text-center p-2 rounded-lg">
         <p id="github-stats-stars-count" class="text-xl font-bold">0</p>
-        <p class="text-tips text-xs">Stars</p>
+        <p class="text-main text-xs">Stars</p>
       </div>
       <div id="github-stats-prs-container" class="text-center p-2 rounded-lg">
         <p id="github-stats-prs-count" class="text-xl font-bold">0</p>
-        <p class="text-tips text-xs">PRs</p>
+        <p class="text-main text-xs">PRs</p>
       </div>
       <div id="github-stats-issues-container" class="text-center p-2 rounded-lg">
         <p id="github-stats-issues-count" class="text-xl font-bold">0</p>
-        <p class="text-tips text-xs">Issues</p>
+        <p class="text-main text-xs">Issues</p>
       </div>
     </div>
 
@@ -109,6 +109,12 @@ export function buildStatsContent(githubUsername: string): string {
           <div id="github-stats-personal-private-toggle" class="personal-details cursor-pointer rounded-md px-3 py-1 text-sm inline-block hidden">
             Private: <span id="personal-private-repos">0</span>
           </div>
+        </div>
+      </div>
+
+      <div class="repo-toggle-container">
+        <div id="github-stats-external-summary" class="cursor-pointer rounded-md text-sm flex items-center px-3 py-1">
+          <span>External</span>
         </div>
       </div>
 

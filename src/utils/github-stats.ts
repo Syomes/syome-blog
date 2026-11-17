@@ -14,13 +14,14 @@ async function fetchGitHubStats(): Promise<GitHubStats> {
 }
 
 type CurrentFilter = {
-  category: 'overall' | 'personal' | 'collaborator';
+  category: 'overall' | 'personal' | 'external' | 'collaborator';
   visibility: 'public' | 'private' | 'total';
 };
 
 let currentActiveFilter: CurrentFilter = { category: 'overall', visibility: 'total' };
 let isLangStatsExpanded = false;
 let fullLanguageList: Language[] = [];
+let langListAutoAnimateController: { disable: () => void; enable: () => void } | null = null;
 
 function updateLanguageToggle(container: HTMLElement, listElement: HTMLElement, languages: Language[]) {
   container.innerHTML = '';
@@ -87,7 +88,6 @@ function updateLanguageDisplay(listElement: HTMLElement, languages: Language[]) 
   listElement.replaceChildren(...newElementList);
 }
 
-
 function initAnimations(githubStats: GitHubStats) {
   animateNumber(document.getElementById('github-stats-contributions-count'), githubStats.contributions || 0, 0);
   animateNumber(document.getElementById('github-stats-repositories-count'), githubStats.repositories.overall || 0, 0);
@@ -112,7 +112,7 @@ function initAnimations(githubStats: GitHubStats) {
     const toggleContainer = document.getElementById('language-toggle-container');
 
     if (langList && toggleContainer) {
-      autoAnimate(langList);
+      langListAutoAnimateController = autoAnimate(langList);
       updateLanguageDisplay(langList, overallLanguages);
       updateLanguageToggle(toggleContainer, langList, overallLanguages);
     }
@@ -121,6 +121,7 @@ function initAnimations(githubStats: GitHubStats) {
   updateDisplayedStats(githubStats, { category: 'overall', visibility: 'total' });
 
   setupRepoToggle('github-stats-personal-summary', 'personal', githubStats);
+  setupRepoToggle('github-stats-external-summary', 'external', githubStats);
   setupRepoToggle('github-stats-collaborator-summary', 'collaborator', githubStats);
 }
 
@@ -128,12 +129,70 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   currentActiveFilter = filter;
   isLangStatsExpanded = false;
 
+  const starsContainer = document.getElementById('github-stats-stars-container');
+  const statsGrid = document.getElementById('github-stats-top-grid');
+
+  if (starsContainer) {
+    if (filter.category === 'external') {
+      starsContainer.classList.add('hidden');
+    } else {
+      starsContainer.classList.remove('hidden');
+    }
+  }
+
+  if (statsGrid) {
+    if (filter.category === 'external') {
+      statsGrid.classList.remove('grid-cols-3');
+      statsGrid.classList.add('grid-cols-2');
+    } else {
+      statsGrid.classList.remove('grid-cols-2');
+      statsGrid.classList.add('grid-cols-3');
+    }
+  }
+
+  const languageSectionElement = document.getElementById('language-stats-section');
+
+  if (filter.category === 'external') {
+    if (languageSectionElement) languageSectionElement.classList.add('hidden');
+  } else {
+    if (languageSectionElement) languageSectionElement.classList.remove('hidden');
+
+    if (filter.category === 'overall') {
+      fullLanguageList = githubStats.languages.overall || [];
+    } else {
+      const categoryData = githubStats.languages[filter.category];
+      if (categoryData) {
+        if (filter.visibility === 'public') fullLanguageList = categoryData.public || [];
+        else if (filter.visibility === 'private') fullLanguageList = categoryData.private || [];
+        else fullLanguageList = categoryData.total || [];
+      }
+    }
+
+    const langList = document.getElementById('language-stats-list');
+    const toggleContainer = document.getElementById('language-toggle-container');
+
+    if (langList && toggleContainer) {
+      if (langListAutoAnimateController) {
+        langListAutoAnimateController.disable();
+      }
+
+      updateLanguageDisplay(langList, fullLanguageList);
+      updateLanguageToggle(toggleContainer, langList, fullLanguageList);
+
+      requestAnimationFrame(() => {
+        if (langListAutoAnimateController) {
+          langListAutoAnimateController.enable();
+        }
+      });
+    }
+  }
+
   const starsCountElement = document.getElementById('github-stats-stars-count');
   const currentStars = parseFloat(starsCountElement?.textContent?.replace(/,/g, '') || '0');
   let newStarsCount = 0;
   if (filter.category === 'overall') {
     newStarsCount = githubStats.stars.overall || 0;
-  } else {
+  } else if (filter.category !== 'external') {
     const categoryData = githubStats.stars[filter.category];
     if (categoryData) {
       if (filter.visibility === 'public') newStarsCount = categoryData.public || 0;
@@ -173,28 +232,8 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   }
   animateNumber(issuesCountElement, newIssuesCount, 0, 1000, false, currentIssues);
 
-  const languageSectionElement = document.getElementById('language-stats-section');
-  if (filter.category === 'overall') {
-    fullLanguageList = githubStats.languages.overall || [];
-  } else {
-    const categoryData = githubStats.languages[filter.category];
-    if (categoryData) {
-      if (filter.visibility === 'public') fullLanguageList = categoryData.public || [];
-      else if (filter.visibility === 'private') fullLanguageList = categoryData.private || [];
-      else fullLanguageList = categoryData.total || [];
-    }
-  }
-
-  if (languageSectionElement) {
-    const langList = document.getElementById('language-stats-list');
-    const toggleContainer = document.getElementById('language-toggle-container');
-    if (langList && toggleContainer) {
-      updateLanguageDisplay(langList, fullLanguageList);
-      updateLanguageToggle(toggleContainer, langList, fullLanguageList);
-    }
-  }
-
   const personalLabel = document.getElementById('personal-label');
+  const externalLabel = document.getElementById('external-label');
   const collaboratorLabel = document.getElementById('collaborator-label');
   const personalTotal = document.getElementById('personal-repos-total');
   const collaboratorTotal = document.getElementById('collaborator-repos-total');
@@ -204,6 +243,7 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
   const collaboratorPrivateToggle = document.getElementById('github-stats-collaborator-private-toggle');
 
   if (personalLabel) personalLabel.classList.remove('hidden');
+  if (externalLabel) externalLabel.classList.remove('hidden');
   if (collaboratorLabel) collaboratorLabel.classList.remove('hidden');
   if (personalTotal) personalTotal.classList.remove('hidden');
   if (collaboratorTotal) collaboratorTotal.classList.remove('hidden');
@@ -214,11 +254,16 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
 
   document.querySelectorAll('.repo-toggle-container .active-filter').forEach(el => el.classList.remove('active-filter'));
 
+  const personalSummary = document.getElementById('github-stats-personal-summary');
+  const externalSummary = document.getElementById('github-stats-external-summary');
+  const collaboratorSummary = document.getElementById('github-stats-collaborator-summary');
+
+  if (personalSummary) personalSummary.classList.remove('active-filter');
+  if (externalSummary) externalSummary.classList.remove('active-filter');
+  if (collaboratorSummary) collaboratorSummary.classList.remove('active-filter');
+
   if (filter.category === 'personal') {
-    const personalSummary = document.getElementById('github-stats-personal-summary');
-    if (personalSummary) {
-      personalSummary.classList.add('active-filter');
-    }
+    if (personalSummary) personalSummary.classList.add('active-filter');
     if (personalLabel) personalLabel.classList.add('hidden');
     if (personalPublicToggle) personalPublicToggle.classList.remove('hidden');
     if (personalPrivateToggle) personalPrivateToggle.classList.remove('hidden');
@@ -230,11 +275,11 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
       document.getElementById('github-stats-personal-public-toggle')?.classList.add('active-filter');
       document.getElementById('github-stats-personal-private-toggle')?.classList.add('active-filter');
     }
+  } else if (filter.category === 'external') {
+    if (externalSummary) externalSummary.classList.add('active-filter');
+    if (externalLabel) externalLabel.classList.add('hidden');
   } else if (filter.category === 'collaborator') {
-    const collaboratorSummary = document.getElementById('github-stats-collaborator-summary');
-    if (collaboratorSummary) {
-      collaboratorSummary.classList.add('active-filter');
-    }
+    if (collaboratorSummary) collaboratorSummary.classList.add('active-filter');
     if (collaboratorLabel) collaboratorLabel.classList.add('hidden');
     if (collaboratorPublicToggle) collaboratorPublicToggle.classList.remove('hidden');
     if (collaboratorPrivateToggle) collaboratorPrivateToggle.classList.remove('hidden');
@@ -246,24 +291,19 @@ function updateDisplayedStats(githubStats: GitHubStats, filter: CurrentFilter) {
       document.getElementById('github-stats-collaborator-public-toggle')?.classList.add('active-filter');
       document.getElementById('github-stats-collaborator-private-toggle')?.classList.add('active-filter');
     }
-  } else {
-    const personalSummary = document.getElementById('github-stats-personal-summary');
-    const collaboratorSummary = document.getElementById('github-stats-collaborator-summary');
-    if (personalSummary) personalSummary.classList.remove('active-filter');
-    if (collaboratorSummary) collaboratorSummary.classList.remove('active-filter');
   }
 }
 
 function setupRepoToggle(
   summaryId: string,
-  category: 'personal' | 'collaborator',
+  category: 'personal' | 'external' | 'collaborator',
   githubStats: GitHubStats
 ) {
   const summaryElement = document.getElementById(summaryId);
   const publicToggle = document.getElementById(`github-stats-${category}-public-toggle`);
   const privateToggle = document.getElementById(`github-stats-${category}-private-toggle`);
 
-  if (summaryElement && publicToggle && privateToggle) {
+  if (summaryElement) {
     summaryElement.addEventListener('click', () => {
       if (currentActiveFilter.category === category && currentActiveFilter.visibility === 'total') {
         updateDisplayedStats(githubStats, { category: 'overall', visibility: 'total' });
@@ -271,7 +311,9 @@ function setupRepoToggle(
         updateDisplayedStats(githubStats, { category: category, visibility: 'total' });
       }
     });
+  }
 
+  if (publicToggle) {
     publicToggle.addEventListener('click', (event) => {
       event.stopPropagation();
       if (currentActiveFilter.category === category && currentActiveFilter.visibility === 'public') {
@@ -280,7 +322,9 @@ function setupRepoToggle(
         updateDisplayedStats(githubStats, { category: category, visibility: 'public' });
       }
     });
+  }
 
+  if (privateToggle) {
     privateToggle.addEventListener('click', (event) => {
       event.stopPropagation();
       if (currentActiveFilter.category === category && currentActiveFilter.visibility === 'private') {
@@ -291,7 +335,6 @@ function setupRepoToggle(
     });
   }
 }
-
 
 function renderGitHubStats(githubStats: GitHubStats) {
   const loadingElement = document.getElementById('github-stats-loading');
@@ -334,8 +377,6 @@ function renderError(error: unknown) {
 }
 
 export async function initializeGitHubStats(): Promise<void> {
-
-
   try {
     const githubStats = await fetchGitHubStats();
     renderGitHubStats(githubStats);

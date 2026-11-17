@@ -26,7 +26,6 @@ export const GET: APIRoute = async () => {
       }
     });
   } catch (error) {
-
     return new Response(JSON.stringify({ error: 'Failed to fetch GitHub stats' }), {
       status: 500,
       headers: {
@@ -138,8 +137,10 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
 
     let personalPrCount = { public: 0, private: 0, total: 0 };
     let collaboratorPrCount = { public: 0, private: 0, total: 0 };
+    let externalPrCount = { public: 0, private: 0, total: 0 };
     let personalIssueCount = { public: 0, private: 0, total: 0 };
     let collaboratorIssueCount = { public: 0, private: 0, total: 0 };
+    let externalIssueCount = { public: 0, private: 0, total: 0 };
 
     try {
       const [prRes, issueRes] = await Promise.all([
@@ -176,6 +177,9 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
               collaboratorPrCount.public++;
             }
             collaboratorPrCount.total++;
+          } else {
+            externalPrCount.public++;
+            externalPrCount.total++;
           }
         }
       } else {
@@ -207,6 +211,9 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
               collaboratorIssueCount.public++;
             }
             collaboratorIssueCount.total++;
+          } else {
+            externalIssueCount.public++;
+            externalIssueCount.total++;
           }
         }
       } else {
@@ -221,12 +228,14 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
       pullRequests: {
         personal: personalPrCount,
         collaborator: collaboratorPrCount,
-        overall: personalPrCount.total + collaboratorPrCount.total
+        external: externalPrCount,
+        overall: personalPrCount.total + collaboratorPrCount.total + externalPrCount.total
       },
       issues: {
         personal: personalIssueCount,
         collaborator: collaboratorIssueCount,
-        overall: personalIssueCount.total + collaboratorIssueCount.total
+        external: externalIssueCount,
+        overall: personalIssueCount.total + collaboratorIssueCount.total + externalIssueCount.total
       },
       repositories: {
         personal: {
